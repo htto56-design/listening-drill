@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+build/
+dist/
+*.spec
+desktop/index.html
+android/assets/index.html
+android/build/

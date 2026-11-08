@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none';script-src 'unsafe-inline';style-src 'unsafe-inline';img-src data:;base-uri 'none';form-action 'none'">
+<meta name="theme-color" content="#F6F3EC">
+<title>听力刷题 · 连做版</title>
+<style>
+:root{
+  --paper:#F6F3EC; --paper2:#EFEAE0; --card:#FFFEFB;
+  --ink:#17302B; --ink2:#5F6E68; --ink3:#93A09A;
+  --line:#E7E1D4; --line2:#DCD4C4;
+  --brand:#173F36; --brand2:#2C5F51; --mint:#D9E7DA;
+  --accent:#B4713C; --accentbg:#FBF1E6;
+  --ok:#2F7A55; --okbg:#EDF5EF; --bad:#B85445; --badbg:#FBEEEA;
+  --shadow:0 1px 2px rgba(23,48,43,.04),0 8px 24px -12px rgba(23,48,43,.16);
+  --r:20px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  font-size:16px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(900px 520px at 82% -8%,rgba(217,231,218,.55),transparent 62%),
+    radial-gradient(680px 420px at -12% 4%,rgba(251,241,230,.75),transparent 60%);
+}
+#app{position:relative;z-index:1}
+.wrap{max-width:760px;margin:0 auto;padding:env(safe-area-inset-top) 20px 40px}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.mono{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+
+/* ---------- 首页 ---------- */
+.top{padding:38px 0 20px}
+.brand{display:flex;align-items:center;gap:9px;margin-bottom:20px}
+.dot-logo{width:11px;height:11px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 4px rgba(23,63,54,.09)}
+.brand span{font-size:11px;letter-spacing:.24em;font-weight:700;color:var(--ink2);text-transform:uppercase}
+h1{font-size:34px;line-height:1.2;margin:0 0 10px;letter-spacing:-.02em;font-weight:800}
+h1 em{font-style:normal;color:var(--brand2)}
+.sub{color:var(--ink2);font-size:13.5px;margin:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sub b{font-weight:700;color:var(--ink)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;background:#fff;border:1px solid var(--line);font-size:11.5px;color:var(--ink2);font-weight:600}
+
+/* 乱序开关 */
+.tog{display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+  background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 15px;
+  margin:20px 0 26px;box-shadow:0 1px 2px rgba(23,48,43,.03);
+  transition:border-color .16s,box-shadow .16s}
+.tog:hover{border-color:var(--line2)}
+.tog .tg-ic{width:34px;height:34px;border-radius:11px;background:#F3EEE4;display:grid;place-items:center;flex:0 0 auto;transition:background .18s}
+.tog.on .tg-ic{background:var(--mint)}
+.tog .tg-tx{flex:1;min-width:0}
+.tog .tg-tx b{display:block;font-size:14px;font-weight:750;letter-spacing:-.01em}
+.tog .tg-tx i{display:block;font-style:normal;font-size:11px;color:var(--ink3);margin-top:1px}
+.sw{width:42px;height:25px;border-radius:99px;background:#DED7C9;position:relative;flex:0 0 auto;transition:background .18s}
+.sw i{position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.18);transition:transform .18s}
+.tog.on .sw{background:var(--brand2)}
+.tog.on .sw i{transform:translateX(17px)}
+
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 13px;gap:10px}
+.sec-h h2{font-size:14px;margin:0;font-weight:750;letter-spacing:.01em}
+.sec-h span{font-size:11.5px;color:var(--ink3)}
+.lnk{font-size:11.5px;color:var(--brand2);font-weight:650;padding:2px 0;flex:0 0 auto}
+.lnk:active{opacity:.6}
+
+/* 随机分类 */
+.rndlist{display:flex;flex-direction:column;gap:9px;margin-bottom:28px}
+.rnd{display:flex;align-items:center;gap:13px;text-align:left;width:100%;
+  background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 15px;
+  box-shadow:0 1px 2px rgba(23,48,43,.03);
+  transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+.rnd:active{transform:scale(.99)}
+.rnd:hover{border-color:var(--line2);box-shadow:var(--shadow)}
+.rnd .ic{width:34px;height:34px;border-radius:11px;background:var(--mint);display:grid;place-items:center;flex:0 0 auto}
+.rnd .tx{flex:1;min-width:0}
+.rnd .tx b{display:block;font-size:14.5px;font-weight:750;letter-spacing:-.01em}
+.rnd .tx i{display:block;font-style:normal;font-size:11px;color:var(--ink3);margin-top:1px}
+.rnd .rt{text-align:right;flex:0 0 auto}
+.rnd .rt b{font-size:15px;font-weight:750;color:var(--ink2)}
+.rnd .rt i{display:block;font-style:normal;font-size:10px;color:var(--ink3);margin-top:-1px}
+.rnd .arw{color:#CFC7B6;flex:0 0 auto;display:grid;place-items:center}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.set{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 15px 14px;
+  display:flex;flex-direction:column;gap:10px;text-align:left;box-shadow:0 1px 2px rgba(23,48,43,.03);
+  transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;position:relative;overflow:hidden;
+}
+.set:active{transform:scale(.975)}
+.set:hover{border-color:var(--line2);box-shadow:var(--shadow)}
+.set .row{display:flex;align-items:center;justify-content:space-between}
+.set .no{font-size:16.5px;font-weight:750;letter-spacing:-.01em}
+.set .cnt{font-size:11px;color:var(--ink3);margin-top:2px}
+.set .cnt b{font-weight:650;color:var(--ink2)}
+.ring{width:34px;height:34px;flex:0 0 auto}
+.ring .bg{fill:none;stroke:#EDE7DB;stroke-width:3.6}
+.ring .fg{fill:none;stroke:var(--brand2);stroke-width:3.6;stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%}
+.bar{height:3px;border-radius:99px;background:#EDE7DB;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--brand2);border-radius:99px;transition:width .5s ease}
+.set .st{font-size:11px;color:var(--ink2);display:flex;justify-content:space-between;align-items:center}
+.set .st .ok{color:var(--ok);font-weight:650}
+
+.foot-note{margin:32px 0 0;text-align:center;font-size:11px;color:var(--ink3);line-height:1.9}
+.foot-note b{color:var(--ink2);font-weight:600}
+
+/* ---------- 练习页 ---------- */
+.qhead{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--line)}
+.qhead .in{max-width:760px;margin:0 auto;padding:calc(12px + env(safe-area-inset-top)) 20px 10px;display:flex;align-items:center;gap:12px}
+.icon-btn{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#fff;border:1px solid var(--line);flex:0 0 auto;transition:transform .15s}
+.icon-btn:active{transform:scale(.92)}
+.qhead .mid{flex:1;min-width:0}
+.qhead .l1{font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{font-size:10px;font-weight:700;color:var(--brand2);background:var(--mint);padding:2px 7px;border-radius:6px;letter-spacing:.03em;flex:0 0 auto}
+.badge.alt{color:var(--accent);background:var(--accentbg)}
+.qhead .l2{font-size:11px;color:var(--ink3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qhead .num{font-size:13px;font-weight:750;color:var(--ink2);flex:0 0 auto;letter-spacing:.02em}
+.pbar{height:2.5px;background:#E5DED0}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--brand2),#4E8A72);transition:width .35s cubic-bezier(.4,0,.2,1)}
+
+.qbody{max-width:760px;margin:0 auto;padding:22px 20px 200px}
+
+/* 篇章连续卡 */
+.passage{
+  border:1px solid var(--line);background:linear-gradient(180deg,#FFFDF8,#FBF8F0);
+  border-radius:16px;padding:13px 15px;margin-bottom:16px;display:flex;align-items:center;gap:12px;
+  box-shadow:0 1px 2px rgba(23,48,43,.03);
+}
+.passage .ic{width:30px;height:30px;border-radius:9px;background:var(--mint);display:grid;place-items:center;flex:0 0 auto}
+.passage .t{font-size:12.5px;font-weight:750;letter-spacing:.01em}
+.passage .d{font-size:11px;color:var(--ink2);margin-top:1px}
+.passage .dots{margin-left:auto;display:flex;gap:5px;flex:0 0 auto}
+.passage .dots i{width:6px;height:6px;border-radius:50%;background:#DCD4C4;display:block;transition:all .2s}
+.passage .dots i.on{background:var(--brand2)}
+.passage .dots i.cur{background:var(--brand2);box-shadow:0 0 0 3px rgba(44,95,81,.16)}
+
+.qmeta{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.qmeta .tag{font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase}
+.qmeta .sep{width:3px;height:3px;border-radius:50%;background:var(--line2)}
+.qno{font-size:27px;font-weight:800;letter-spacing:-.03em;line-height:1.15;margin:0 0 4px}
+.qno small{font-size:12px;font-weight:600;color:var(--ink3);letter-spacing:0;margin-left:8px;vertical-align:middle}
+.qask{font-size:13px;color:var(--ink2);margin:0 0 18px}
+
+/* 连做卡片 */
+.qcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px 14px 14px;margin-bottom:11px;
+  box-shadow:0 1px 2px rgba(23,48,43,.03);transition:border-color .18s,box-shadow .18s,background .18s}
+.qcard.focus{border-color:#BFD3C6;box-shadow:0 0 0 3px rgba(44,95,81,.055)}
+.qcard.graded{background:#FFFDF8}
+.qh{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.qh .qt{font-size:15px;font-weight:800;letter-spacing:-.01em}
+.qh .qn{font-size:11px;color:var(--ink3);font-weight:600;margin-left:-4px}
+.qh .qs{margin-left:auto;font-size:10.5px;font-weight:700;color:var(--ink3);background:#F3EEE4;padding:3px 9px;border-radius:99px;transition:all .18s;white-space:nowrap}
+.qh .qs.on{color:var(--brand2);background:var(--mint)}
+.qh .qs.ok{color:var(--ok);background:var(--okbg)}
+.qh .qs.no{color:var(--bad);background:var(--badbg)}
+
+/* 结果汇总条 */
+.gsum{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:13px 15px;margin-bottom:14px;box-shadow:var(--shadow);animation:rise .28s ease both}
+.gsum .gt{flex:1;min-width:0}
+.gsum .gt b{font-size:14px;font-weight:780;letter-spacing:-.01em}
+.gsum .gt span{display:block;font-size:11px;color:var(--ink3);margin-top:1px}
+.gsum .gd{display:flex;gap:5px;flex:0 0 auto}
+.gsum .gd i{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:11px;font-weight:750;font-style:normal}
+.gsum .gd i.ok{background:var(--okbg);color:var(--ok)}
+.gsum .gd i.no{background:var(--badbg);color:var(--bad)}
+
+.opts{display:flex;flex-direction:column;gap:10px}
+.qcard .opts{gap:8px}
+.opts.anim .opt{animation:rise .26s cubic-bezier(.22,.9,.3,1) both}
+.opt{
+  display:flex;align-items:flex-start;gap:13px;width:100%;text-align:left;
+  background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:15px 16px;
+  transition:border-color .16s,background .16s,transform .12s,box-shadow .18s;
+}
+.qcard .opt{padding:12px 13px;border-radius:13px;gap:11px;background:#FFFEFC}
+.opt:not(.locked):active{transform:scale(.985)}
+.opt:not(.locked):hover{border-color:#C9C0AC;box-shadow:0 3px 14px -10px rgba(23,48,43,.4)}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.opt .L{
+  width:28px;height:28px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;
+  font-size:12.5px;font-weight:750;color:var(--ink2);background:#F3EEE4;border:1px solid var(--line2);
+  transition:all .16s;margin-top:1px;
+}
+.qcard .opt .L{width:25px;height:25px;font-size:11.5px;margin-top:0}
+.opt .body{flex:1;min-width:0}
+.opt .en{font-size:16px;line-height:1.48;letter-spacing:-.003em;word-break:break-word}
+.qcard .opt .en{font-size:14.5px;line-height:1.45}
+.opt .zh{font-size:12.5px;color:var(--ink2);margin-top:5px;display:none;line-height:1.5}
+.qcard .opt .zh{font-size:11.5px;margin-top:3px}
+.opt.answered .zh,.opt.sel .zh{display:block}
+.opt.sel{border-color:var(--brand2);background:#F5F9F4}
+.opt.sel .L{background:var(--brand2);color:#fff;border-color:var(--brand2)}
+.opt.sel .zh{color:#4C6A5E}
+.opt.correct .zh{color:#3C6B51}
+.opt.wrong .zh{color:#8A5B4F}
+.opt .mark{font-size:10.5px;font-weight:700;color:var(--ok);margin-top:6px;display:none;letter-spacing:.02em}
+.opt.correct{border-color:var(--ok);background:var(--okbg)}
+.opt.correct .L{background:var(--ok);color:#fff;border-color:var(--ok)}
+.opt.correct .zh{display:block;color:#3C6B51}
+.opt.correct .mark{display:block}
+.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.opt.wrong .L{background:var(--bad);color:#fff;border-color:var(--bad)}
+.opt.wrong .zh{display:block;color:#8A5B4F}
+.opt.dim{opacity:.74}
+.opt.locked{cursor:default}
+.opt .tick{width:16px;height:16px;flex:0 0 auto;margin-top:6px;display:none}
+.opt.correct .tick{display:block}
+
+/* 结果条 */
+.verdict{display:flex;align-items:center;gap:10px;margin:22px 0 14px;animation:rise .3s ease both}
+.verdict .v{font-size:13.5px;font-weight:750;display:flex;align-items:center;gap:7px}
+.verdict.ok .v{color:var(--ok)}
+.verdict.no .v{color:var(--bad)}
+.verdict .hint{font-size:11.5px;color:var(--ink3);margin-left:auto}
+
+/* 答案卡 */
+.ans{
+  background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px 18px 16px;
+  box-shadow:var(--shadow);animation:rise .32s cubic-bezier(.22,.9,.3,1) both;overflow:hidden;
+}
+.ans .h{display:flex;align-items:center;gap:9px;padding-bottom:12px;border-bottom:1px dashed var(--line)}
+.ans .h .k{flex:0 0 auto;font-size:10.5px;font-weight:700;letter-spacing:.12em;color:var(--ink3);text-transform:uppercase}
+.ans .h .a{margin-left:auto;display:flex;align-items:baseline;gap:6px;min-width:0;justify-content:flex-end}
+.ans .h .a b{font-size:20px;font-weight:800;color:var(--ok);letter-spacing:-.01em;flex:0 0 auto}
+.ans .h .a span{font-size:11px;color:var(--ink3);text-align:right;line-height:1.35}
+.tip{
+  margin-top:15px;background:var(--accentbg);border-radius:13px;padding:12px 13px 12px 14px;
+  display:flex;gap:10px;position:relative;border:1px solid #F1E2CF;
+}
+.tip::before{content:"";position:absolute;left:0;top:11px;bottom:11px;width:2.5px;border-radius:9px;background:#D8A76F}
+.tip .ti{flex:0 0 auto;margin-top:1px}
+.tip .c{font-size:11.8px;line-height:1.68;color:#8E5C2E}
+.tip .c b{color:var(--accent);font-weight:750}
+.tip .lb{font-size:9.5px;font-weight:800;letter-spacing:.14em;color:#C08B54;margin-bottom:3px}
+.src{margin-top:13px;padding-top:11px;border-top:1px dashed var(--line);display:flex;gap:7px;align-items:flex-start;font-size:11px;line-height:1.6;color:var(--ink3)}
+.src .si{flex:0 0 auto;margin-top:1px;opacity:.7}
+.src b{color:var(--ink2);font-weight:650}
+
+/* 连做反馈 */
+.fb{margin-top:11px;border-radius:13px;padding:11px 12px;animation:rise .28s ease both}
+.fb.ok{background:var(--okbg);border:1px solid #D5E6DA}
+.fb.no{background:var(--badbg);border:1px solid #F0DAD3}
+.fb .fbh{display:flex;align-items:baseline;gap:8px}
+.fb .fbh .r{font-size:12.5px;font-weight:780}
+.fb.ok .fbh .r{color:var(--ok)}
+.fb.no .fbh .r{color:var(--bad)}
+.fb .al{margin-left:auto;font-size:11px;font-weight:600;color:var(--ink2);text-align:right;line-height:1.4}
+.fb .al b{font-weight:800}
+.fb .fbt{margin-top:8px;font-size:11.5px;line-height:1.68;color:#8E5C2E;background:var(--accentbg);border-radius:9px;padding:8px 10px;border:1px solid #F1E2CF}
+.fb .fbt b{color:var(--accent);font-weight:800;letter-spacing:.08em;font-size:9.5px;margin-right:5px}
+.fb .fbt em,.tip .c em{font-style:normal;font-weight:800;color:#8A4A15;margin:0 1px}
+
+/* 底部操作条 */
+.actions{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  padding:12px 20px calc(12px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(246,243,236,0),rgba(246,243,236,.86) 22%,var(--paper) 52%);
+}
+.actions .in{max-width:760px;margin:0 auto;display:flex;gap:10px}
+.btn{
+  flex:1;height:52px;border-radius:15px;font-size:15px;font-weight:750;letter-spacing:.01em;
+  display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .14s,opacity .2s,box-shadow .2s,background .2s;
+}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--brand);color:#F4F8F3;box-shadow:0 10px 24px -14px rgba(23,63,54,.9)}
+.btn-primary:disabled{background:#E4DDCD;color:#9C9688;box-shadow:none}
+.btn-ghost{flex:0 0 auto;width:52px;background:#fff;border:1px solid var(--line);color:var(--ink2)}
+.btn-soft{background:#fff;border:1px solid var(--line);color:var(--ink);padding:0 18px}
+.btn-prev{flex:0 0 auto;width:104px;background:#fff;border:1px solid var(--line);color:var(--ink2);font-size:14px;gap:3px}
+.btn-prev:disabled{color:#C6C0B2;background:#FBF9F4;box-shadow:none;cursor:default}
+
+/* ---------- 结果页 ---------- */
+.result{padding:46px 0 30px;text-align:center}
+.result .lab{font-size:11px;letter-spacing:.2em;color:var(--ink3);font-weight:700;text-transform:uppercase}
+.result h2{font-size:22px;margin:12px 0 26px;font-weight:780;letter-spacing:-.01em}
+.score{position:relative;width:186px;height:186px;margin:0 auto 8px}
+.score svg{transform:rotate(-90deg)}
+.score .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score .big{font-size:46px;font-weight:800;letter-spacing:-.04em;line-height:1}
+.score .big span{font-size:18px;font-weight:700;margin-left:1px}
+.score .sm{font-size:11.5px;color:var(--ink2);margin-top:6px}
+.stats{display:flex;justify-content:center;gap:26px;margin:20px 0 4px}
+.stats .s{text-align:center}
+.stats .s b{display:block;font-size:19px;font-weight:780}
+.stats .s span{font-size:11px;color:var(--ink3)}
+.stats .s.ok b{color:var(--ok)}
+.stats .s.no b{color:var(--bad)}
+
+.review{margin-top:30px;text-align:left}
+.review h3{font-size:13px;margin:0 0 12px;font-weight:750;display:flex;align-items:center;gap:8px}
+.review h3 span{font-size:11px;color:var(--ink3);font-weight:500}
+.rev{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:9px}
+.rev .t{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--ink3);margin-bottom:5px}
+.rev .t b{color:var(--ink);font-size:11.5px}
+.rev .t .r{margin-left:auto;font-weight:700}
+.rev .t .r.ok{color:var(--ok)}
+.rev .t .r.no{color:var(--bad)}
+.rev .e{font-size:13px;line-height:1.45}
+.rev .z{font-size:11.5px;color:var(--ink2);margin-top:3px}
+
+.result-actions{display:flex;flex-direction:column;gap:10px;margin-top:26px}
+.result-actions .row{display:flex;gap:10px}
+/* 两个按钮的左右内边距必须一致，否则 flex-basis:0 下会按 padding 差值分宽度 */
+.result-actions .row .btn{padding:0 18px}
+
+.empty{text-align:center;color:var(--ink3);font-size:12.5px;padding:26px 0}
+.hintcard{margin-top:22px;border-top:1px dashed var(--line2);padding-top:16px;display:flex;gap:10px;align-items:flex-start}
+.hintcard .hi{flex:0 0 auto;margin-top:1px;opacity:.55}
+.hintcard .hc{font-size:11.8px;line-height:1.7;color:var(--ink3)}
+.hintcard .hc b{color:var(--ink2);font-weight:650;display:block;font-size:10.5px;letter-spacing:.1em;margin-bottom:3px}
+
+/* ---------- 课文填空 ---------- */
+.cl-intro{
+  font-size:11.8px;line-height:1.7;color:#8E5C2E;background:var(--accentbg);
+  border:1px solid #F1E2CF;border-radius:13px;padding:11px 13px;margin:0 0 15px;
+}
+.cl-intro b{font-weight:750;color:var(--accent)}
+.clrow{
+  background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:13px 15px 15px;margin-bottom:10px;box-shadow:0 1px 2px rgba(23,48,43,.03);
+  transition:border-color .2s,background .2s;
+}
+.clrow.done{border-color:#CFE0D5;background:#FBFDFA}
+.clrow .ct{font-size:10.5px;font-weight:750;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px}
+.clrow.done .ct{color:var(--ok)}
+.clrow .ce{
+  font-family:"Times New Roman",Georgia,"Songti SC",serif;
+  font-size:16.5px;line-height:2.2;color:#22332E;letter-spacing:.002em;
+}
+.field{position:relative;display:inline-block;white-space:nowrap}
+.blank{
+  font-family:inherit;font-size:inherit;line-height:1.5;color:var(--ink);text-align:center;
+  padding:1px 7px 0;margin:0 1px;border:0;border-bottom:2px solid #D8D0BE;
+  background:rgba(255,255,255,.72);border-radius:6px 6px 0 0;outline:none;
+  transition:background .16s,border-color .16s,color .16s,box-shadow .16s;
+}
+.blank::placeholder{color:#D3CAB6;font-size:.9em}
+.blank:hover{border-bottom-color:#BCB096;background:#fff}
+.blank:focus{border-bottom-color:var(--brand2);background:#fff;box-shadow:0 2px 0 -1px rgba(44,95,81,.22)}
+.blank.ok{border-bottom-color:var(--ok);background:var(--okbg);color:var(--ok);font-weight:700}
+.blank.bad{border-bottom-color:var(--bad);background:var(--badbg);color:var(--bad);font-weight:700}
+.field .mk{
+  position:absolute;top:-7px;right:-5px;width:15px;height:15px;border-radius:50%;
+  display:none;place-items:center;font-style:normal;font-size:9.5px;font-weight:900;
+  color:#fff;font-family:Arial,Helvetica,sans-serif;box-shadow:0 1px 3px rgba(0,0,0,.16);pointer-events:none;
+}
+.field.ok .mk{display:grid;background:var(--ok)}
+.field.bad .mk{display:grid;background:var(--bad)}
+.ghost{font-family:"Times New Roman",Georgia,serif;font-size:.8em;color:#2F9E77;margin-left:4px}
+.clfin{
+  display:none;align-items:center;gap:11px;background:var(--okbg);border:1px solid #CFE0D5;
+  border-radius:16px;padding:12px 14px;margin-bottom:13px;
+}
+.clfin.show{display:flex;animation:rise .32s ease both}
+.clfin .tk{width:30px;height:30px;border-radius:50%;background:var(--ok);color:#fff;display:grid;place-items:center;font-weight:800;font-size:15px;flex:0 0 auto}
+.clfin b{display:block;font-size:13.5px;color:var(--ok);font-weight:780}
+.clfin span{font-size:11px;color:var(--ink2)}
+.cl-foot{margin:16px 4px 0;font-size:11.3px;line-height:1.9;color:var(--ink3)}
+.cl-foot b{color:var(--ink2);font-weight:650}
+.cl-foot kbd{font-family:inherit;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;background:#EFE9DA;border:1px solid #E0D8C3;color:#6C6453}
+
+@media (max-width:380px){
+  h1{font-size:29px}
+  .grid{gap:9px}
+  .opt .en{font-size:15px}
+  .qbody{padding-left:15px;padding-right:15px}
+  .wrap{padding-left:15px;padding-right:15px}
+  .qcard .opt .en{font-size:14px}
+}
+@media (min-width:720px){
+  .grid{grid-template-columns:repeat(3,1fr)}
+  h1{font-size:38px}
+  .qno{font-size:32px}
+  .opt{padding:17px 18px}
+  .opt .en{font-size:17px}
+  .opt .zh{font-size:13px}
+  .qask{font-size:13.5px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script id="bank-data" type="application/json">[{"id":1,"title":"第1套","questions":[{"no":1,"answer":"A","section":"A","group":null,"range":null,"options":{"A":{"en":"Hurry to the platform.","zh":"赶快去站台。"},"B":{"en":"Run to the bus station.","zh":"跑去公交车站。"},"C":{"en":"Wait for five minutes.","zh":"等五分钟。"},"D":{"en":"Run to London.","zh":"跑去伦敦。"}},"type":"short","tip":"记：赶车别磨蹭，一路冲站台。","key":"赶快去站台","tipType":"hook"},{"no":2,"answer":"B","section":"A","group":null,"range":null,"options":{"A":{"en":"The Italian restaurant.","zh":"意大利餐馆。"},"B":{"en":"The Chinese restaurant.","zh":"中餐馆。"},"C":{"en":"The fast food restaurant.","zh":"快餐店。"},"D":{"en":"McDonald’s.","zh":"麦当劳。"}},"type":"short","tip":"记：意餐、快餐都靠边，馋的还是中餐馆。","key":"中餐馆","tipType":"hook"},{"no":3,"answer":"B","section":"A","group":null,"range":null,"options":{"A":{"en":"Go on working hard.","zh":"继续努力工作。"},"B":{"en":"Take a break.","zh":"休息一下。"},"C":{"en":"Go and work outdoors.","zh":"去户外工作。"},"D":{"en":"Work together with the man.","zh":"和这位男士一起工作。"}},"type":"short","tip":"记：活儿干不完，先歇一会儿——休息一下。","key":"休息一下","tipType":"hook"},{"no":4,"answer":"C","section":"A","group":null,"range":null,"options":{"A":{"en":"The woman will pass the math exam.","zh":"这位女士会通过数学考试。"},"B":{"en":"The woman have too many animals.","zh":"这位女士养了太多动物。"},"C":{"en":"The woman had too many parties.","zh":"这位女士参加了太多聚会。"},"D":{"en":"The woman is not good at math.","zh":"这位女士数学不好。"}},"type":"detail","tip":"记：聚会一场接一场，课自然跟不上。","key":"这位女士参加了太多聚会","tipType":"hook"},{"no":5,"answer":"C","section":"A","group":null,"range":null,"options":{"A":{"en":"$20.","zh":"20 美元。"},"B":{"en":"$16.","zh":"16 美元。"},"C":{"en":"$8.","zh":"8 美元。"},"D":{"en":"$4.","zh":"4 美元。"}},"type":"number","tip":"记：八美元，发（8）财。","key":"8 美元","tipType":"hook"},{"no":6,"answer":"C","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"A beast.","zh":"一头野兽。"},"B":{"en":"A party.","zh":"一场聚会。"},"C":{"en":"An unidentified flying object.","zh":"一个不明飞行物。"},"D":{"en":"A drunk driver.","zh":"一个喝醉的司机。"}},"type":"short","tip":"⑥不明飞行物在⑦凌晨五点落地，⑧野兽把他从车里拖出来，⑨他说自己大概是喝醉了。","key":"一个不明飞行物","tipType":"chain"},{"no":7,"answer":"B","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"2:00 A.M.","zh":"凌晨2:00。"},"B":{"en":"5:00 A.M.","zh":"凌晨5:00。"},"C":{"en":"2:00 P.M.","zh":"下午2:00。"},"D":{"en":"5:00 P.M.","zh":"下午5:00。"}},"type":"number","tip":"⑥不明飞行物在⑦凌晨五点落地，⑧野兽把他从车里拖出来，⑨他说自己大概是喝醉了。","key":"凌晨500","tipType":"chain"},{"no":8,"answer":"A","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"Because a beast pulled him out of the car and left him along the road.","zh":"因为一头野兽把他从车里拖出来，扔在了路边。"},"B":{"en":"Because the beast from the flying saucer could speak English.","zh":"因为飞碟里的野兽会说英语。"},"C":{"en":"Because he woke up and found himself in a round-shaped flying saucer.","zh":"因为他醒来时发现自己在一个圆形的飞碟里。"},"D":{"en":"Because he chased the flying saucer and saw it land.","zh":"因为他追赶飞碟并看见它降落。"}},"type":"reason","tip":"⑥不明飞行物在⑦凌晨五点落地，⑧野兽把他从车里拖出来，⑨他说自己大概是喝醉了。","key":"因为一头野兽把他从车里拖出来扔在了路边","tipType":"chain"},{"no":9,"answer":"C","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"He took some drugs earlier during the party.","zh":"他先前在聚会上吸了毒。"},"B":{"en":"He was dreaming.","zh":"他在做梦。"},"C":{"en":"He might be drunk.","zh":"他可能喝醉了。"},"D":{"en":"He took some medication.","zh":"他吃了些药。"}},"type":"short","tip":"⑥不明飞行物在⑦凌晨五点落地，⑧野兽把他从车里拖出来，⑨他说自己大概是喝醉了。","key":"他可能喝醉了","tipType":"chain"},{"no":10,"answer":"C","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"Go to see a movie.","zh":"去看电影。"},"B":{"en":"Eat out.","zh":"出去吃饭。"},"C":{"en":"Cram for an exam.","zh":"突击备考。"},"D":{"en":"Have a birthday party for Sara.","zh":"为萨拉举办生日派对。"}},"type":"detail","tip":"⑩两人突击备考，⑪约在晚上7:30，⑫只能在家学习，⑬艾米怕是半夜才回。","key":"突击备考","tipType":"chain"},{"no":11,"answer":"C","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"11:30 P.M.","zh":"晚上11:30。"},"B":{"en":"10:30 P.M.","zh":"晚上10:30。"},"C":{"en":"7:30 P.M.","zh":"晚上7:30。"},"D":{"en":"6:30 P.M.","zh":"晚上6:30。"}},"type":"number","tip":"⑩两人突击备考，⑪约在晚上7:30，⑫只能在家学习，⑬艾米怕是半夜才回。","key":"晚上730","tipType":"chain"},{"no":12,"answer":"D","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"Go to work.","zh":"去上班。"},"B":{"en":"Hang out with Stuart.","zh":"和斯图尔特一起出去玩。"},"C":{"en":"Stay at home and relax.","zh":"待在家里放松。"},"D":{"en":"Study at home.","zh":"在家学习。"}},"type":"short","tip":"⑩两人突击备考，⑪约在晚上7:30，⑫只能在家学习，⑬艾米怕是半夜才回。","key":"在家学习","tipType":"chain"},{"no":13,"answer":"B","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"Amy may end up staying at home.","zh":"艾米最后可能还是待在家里。"},"B":{"en":"Amy may come home at midnight.","zh":"艾米可能半夜才回家。"},"C":{"en":"Stuart will prepare for the test together with Amy.","zh":"斯图尔特会和艾米一起备考。"},"D":{"en":"Amy has a lot of friends and is always busy.","zh":"艾米朋友很多，总是很忙。"}},"type":"detail","tip":"⑩两人突击备考，⑪约在晚上7:30，⑫只能在家学习，⑬艾米怕是半夜才回。","key":"艾米可能半夜才回家","tipType":"chain"},{"no":14,"answer":"B","section":"C","group":"Passage One","range":[14,17],"options":{"A":{"en":"Her talents.","zh":"她的才华。"},"B":{"en":"Firm support from her family.","zh":"来自家人的坚定支持。"},"C":{"en":"Her artistic training.","zh":"她接受的艺术训练。"},"D":{"en":"The publishing of her novels.","zh":"她的小说的出版。"}},"type":"detail","tip":"⑭家人坚定支持，⑮她写完三部小说又动第四部，⑯公开身份会毁掉女性名誉，⑰那部叫《桑迪顿》。","key":"来自家人的坚定支持","tipType":"chain"},{"no":15,"answer":"D","section":"C","group":"Passage One","range":[14,17],"options":{"A":{"en":"It lasted about thirty-five years.","zh":"这段时期持续了大约三十五年。"},"B":{"en":"She experimented with writing novels only.","zh":"她只尝试过小说写作。"},"C":{"en":"She failed to achieve success as a published writer.","zh":"她未能在出版作品方面取得成功。"},"D":{"en":"She wrote and revised three major novels and began a fourth.","zh":"她写作并修改了三部重要小说，并开始了第四部的创作。"}},"type":"detail","tip":"⑭家人坚定支持，⑮她写完三部小说又动第四部，⑯公开身份会毁掉女性名誉，⑰那部叫《桑迪顿》。","key":"她写作并修改了三部重要小说并开始了第四部的创","tipType":"chain"},{"no":16,"answer":"B","section":"C","group":"Passage One","range":[14,17],"options":{"A":{"en":"Because she was not allowed to show her authorship.","zh":"因为她不被允许表明自己的作者身份。"},"B":{"en":"Because it would harm women’s social reputation to reveal their authorship.","zh":"因为公开作者身份会有损女性的社会名誉。"},"C":{"en":"Because the upper class did not care about the author of the novels.","zh":"因为上流社会并不在意小说的作者是谁。"},"D":{"en":"Because she would like to keep her authorship a secret.","zh":"因为她想对自己的作者身份保密。"}},"type":"reason","tip":"⑭家人坚定支持，⑮她写完三部小说又动第四部，⑯公开身份会毁掉女性名誉，⑰那部叫《桑迪顿》。","key":"因为公开作者身份会有损女性的社会名誉","tipType":"chain"},{"no":17,"answer":"C","section":"C","group":"Passage One","range":[14,17],"options":{"A":{"en":"Emma.","zh":"《爱玛》。"},"B":{"en":"Persuasion.","zh":"《劝导》。"},"C":{"en":"Sanditon.","zh":"《桑迪顿》。"},"D":{"en":"Northanger Abbey.","zh":"《诺桑觉寺》。"}},"type":"short","tip":"⑭家人坚定支持，⑮她写完三部小说又动第四部，⑯公开身份会毁掉女性名誉，⑰那部叫《桑迪顿》。","key":"《桑迪顿》","tipType":"chain"},{"no":18,"answer":"A","section":"C","group":"Passage Two","range":[18,21],"options":{"A":{"en":"In 1985.","zh":"1985 年。"},"B":{"en":"In 1986.","zh":"1986 年。"},"C":{"en":"In 1987.","zh":"1987 年。"},"D":{"en":"In 1988.","zh":"1988 年。"}},"type":"timeplace","tip":"⑱1985年，⑲他在新创的投资公司兼职，⑳做金融与银行业投资，㉑只为让年轻人选对路。","key":"1985 年","tipType":"chain"},{"no":19,"answer":"D","section":"C","group":"Passage Two","range":[18,21],"options":{"A":{"en":"Being a junior designer in a newly started company.","zh":"在一家新创办的公司做初级设计师。"},"B":{"en":"Being a lecturer in a counseling business.","zh":"在一家咨询公司做讲师。"},"C":{"en":"Being a golf coach in a sports school.","zh":"在一所体育学校做高尔夫教练。"},"D":{"en":"Being a part-time worker in a newly started investment business.","zh":"在一家新创办的投资公司做兼职员工。"}},"type":"detail","tip":"⑱1985年，⑲他在新创的投资公司兼职，⑳做金融与银行业投资，㉑只为让年轻人选对路。","key":"在一家新创办的投资公司做兼职员工","tipType":"chain"},{"no":20,"answer":"B","section":"C","group":"Passage Two","range":[18,21],"options":{"A":{"en":"Management of a supermarket.","zh":"超市管理。"},"B":{"en":"Investment in the financial market and banking.","zh":"金融市场与银行业方面的投资。"},"C":{"en":"Improvement in the golf coaching.","zh":"高尔夫教学方面的改进。"},"D":{"en":"Establishment of a programming company.","zh":"创办一家编程公司。"}},"type":"detail","tip":"⑱1985年，⑲他在新创的投资公司兼职，⑳做金融与银行业投资，㉑只为让年轻人选对路。","key":"金融市场与银行业方面的投资","tipType":"chain"},{"no":21,"answer":"C","section":"C","group":"Passage Two","range":[18,21],"options":{"A":{"en":"So that a youngster can gain more money to support himself.","zh":"以便年轻人能挣更多钱养活自己。"},"B":{"en":"So that a youngster can find a good chance to start his own business.","zh":"以便年轻人能找到自己创业的好机会。"},"C":{"en":"So that a youngster can make the right choices and excel in his career.","zh":"以便年轻人能做出正确选择，并在职业上出类拔萃。"},"D":{"en":"So that a youngster can let more people know himself.","zh":"以便年轻人能让更多人认识自己。"}},"type":"detail","tip":"⑱1985年，⑲他在新创的投资公司兼职，⑳做金融与银行业投资，㉑只为让年轻人选对路。","key":"以便年轻人能做出正确选择并在职业上出类拔萃","tipType":"chain"},{"no":22,"answer":"C","section":"C","group":"Passage Three","range":[22,24],"options":{"A":{"en":"The changing temperature.","zh":"变化的温度。"},"B":{"en":"The changing weather.","zh":"变化的天气。"},"C":{"en":"The changing air currents.","zh":"变化的气流。"},"D":{"en":"The changing greenhouse effect.","zh":"变化的温室效应。"}},"type":"short","tip":"㉒变的是气流，㉓只有两个，㉔北极暖得异常快。","key":"变化的气流","tipType":"chain"},{"no":23,"answer":"A","section":"C","group":"Passage Three","range":[22,24],"options":{"A":{"en":"Two.","zh":"两个。"},"B":{"en":"Three.","zh":"三个。"},"C":{"en":"Four.","zh":"四个。"},"D":{"en":"One.","zh":"一个。"}},"type":"short","tip":"㉒变的是气流，㉓只有两个，㉔北极暖得异常快。","key":"两个","tipType":"chain"},{"no":24,"answer":"C","section":"C","group":"Passage Three","range":[22,24],"options":{"A":{"en":"The west of America has warmed unusually fast.","zh":"美国西部变暖的速度异常快。"},"B":{"en":"The east of America has warmed unusually fast.","zh":"美国东部变暖的速度异常快。"},"C":{"en":"The Arctic has warmed unusually fast.","zh":"北极变暖的速度异常快。"},"D":{"en":"The south of America has warmed unusually fast.","zh":"美国南部变暖的速度异常快。"}},"type":"detail","tip":"㉒变的是气流，㉓只有两个，㉔北极暖得异常快。","key":"北极变暖的速度异常快","tipType":"chain"}]},{"id":2,"title":"第2套","questions":[{"no":1,"answer":"C","section":"A","group":null,"range":null,"options":{"A":{"en":"The courses are not suitable for the woman.","zh":"这些课程不适合这位女士。"},"B":{"en":"The woman should choose more courses.","zh":"这位女士应该多选一些课程。"},"C":{"en":"The woman shouldn’t take so many courses.","zh":"这位女士不应该选这么多课程。"},"D":{"en":"He will take the same courses.","zh":"他会选同样的课程。"}},"type":"detail","tip":"记：她不该选这么多课，贪多嚼不烂。","key":"这位女士不应该选这么多课程","tipType":"hook"},{"no":2,"answer":"A","section":"A","group":null,"range":null,"options":{"A":{"en":"$6.","zh":"6 美元。"},"B":{"en":"$8.","zh":"8 美元。"},"C":{"en":"$10.","zh":"10 美元。"},"D":{"en":"$12.","zh":"12 美元。"}},"type":"number","tip":"记：六美元，溜（6）得比谁都快。","key":"6 美元","tipType":"hook"},{"no":3,"answer":"D","section":"A","group":null,"range":null,"options":{"A":{"en":"2019.","zh":"2019 年。"},"B":{"en":"2018.","zh":"2018 年。"},"C":{"en":"2014.","zh":"2014 年。"},"D":{"en":"2017.","zh":"2017 年。"}},"type":"number","tip":"记：2017，一起（17）走过的那年。","key":"2017 年","tipType":"hook"},{"no":4,"answer":"B","section":"A","group":null,"range":null,"options":{"A":{"en":"He got injured in the elevator.","zh":"他在电梯里受了伤。"},"B":{"en":"He was not seriously injured.","zh":"他伤得不重。"},"C":{"en":"He was trapped in the elevator for a long time.","zh":"他被困在电梯里很长时间。"},"D":{"en":"He was shocked by the rescue person.","zh":"他被救援人员电击了。"}},"type":"detail","tip":"记：电梯出事，人没事——伤得不重。","key":"他伤得不重","tipType":"hook"},{"no":5,"answer":"C","section":"A","group":null,"range":null,"options":{"A":{"en":"It is rainy in the morning.","zh":"早上有雨。"},"B":{"en":"It is cold in the morning.","zh":"早上很冷。"},"C":{"en":"It will rain in the afternoon.","zh":"下午会下雨。"},"D":{"en":"It will be cloudy in the afternoon.","zh":"下午是多云天气。"}},"type":"detail","tip":"记：下午有雨，出门带伞。","key":"下午会下雨","tipType":"hook"},{"no":6,"answer":"C","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"manager and customer.","zh":"经理与顾客。"},"B":{"en":"chef and customer.","zh":"厨师与顾客。"},"C":{"en":"waitress and customer.","zh":"女服务员与顾客。"},"D":{"en":"waitress and manager.","zh":"女服务员与经理。"}},"type":"short","tip":"⑥女服务员招呼顾客，⑦披萨不合她口味，⑧一半辣香肠蘑菇一半青椒，⑨送到南16东街1340号。","key":"女服务员与顾客","tipType":"chain"},{"no":7,"answer":"D","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"It is delicious.","zh":"它很美味。"},"B":{"en":"It tastes awful.","zh":"它很难吃。"},"C":{"en":"It’s her favorite.","zh":"它是她的最爱。"},"D":{"en":"It’s not her cup of tea.","zh":"它不合她的口味。"}},"type":"short","tip":"⑥女服务员招呼顾客，⑦披萨不合她口味，⑧一半辣香肠蘑菇一半青椒，⑨送到南16东街1340号。","key":"它不合她的口味","tipType":"chain"},{"no":8,"answer":"A","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"Pepperoni and mushrooms on one half and green peppers and Italian sausage on the other.","zh":"一半是意大利辣香肠和蘑菇，另一半是青椒和意大利香肠。"},"B":{"en":"Pepperoni and mushrooms on one half and shrimp, clams and squid on the other.","zh":"一半是意大利辣香肠和蘑菇，另一半是虾、蛤蜊和鱿鱼。"},"C":{"en":"Pepperoni pizza with mushrooms and green peppers.","zh":"加了蘑菇和青椒的意大利辣香肠披萨。"},"D":{"en":"Swimmer’s special and extra cheese.","zh":"游泳者特餐再加芝士。"}},"type":"relation","tip":"⑥女服务员招呼顾客，⑦披萨不合她口味，⑧一半辣香肠蘑菇一半青椒，⑨送到南16东街1340号。","key":"一半是意大利辣香肠和蘑菇另一半是青椒和意大利","tipType":"chain"},{"no":9,"answer":"B","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"1314 South 60 East.","zh":"南60东街1314号。"},"B":{"en":"1340 South 16 East.","zh":"南16东街1340号。"},"C":{"en":"1314 South 16 East.","zh":"南16东街1314号。"},"D":{"en":"1340 South 60 East.","zh":"南60东街1340号。"}},"type":"number","tip":"⑥女服务员招呼顾客，⑦披萨不合她口味，⑧一半辣香肠蘑菇一半青椒，⑨送到南16东街1340号。","key":"南16东街1340号","tipType":"chain"},{"no":10,"answer":"C","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"Phil’s experience of going to a swimming pool in the States.","zh":"菲尔在美国去游泳池的经历。"},"B":{"en":"Nate’s experience of going to a swimming pool in the States.","zh":"内特在美国去游泳池的经历。"},"C":{"en":"Phil’s experience of going to a Japanese public bath.","zh":"菲尔去日本公共澡堂的经历。"},"D":{"en":"Nate’s experience of going to a Japanese public bath.","zh":"内特去日本公共澡堂的经历。"}},"type":"detail","tip":"⑩菲尔去日本公共澡堂，⑪什么都不用带，⑫顺便和邻居社交，⑬还互相搓背。","key":"菲尔去日本公共澡堂的经历","tipType":"chain"},{"no":11,"answer":"D","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"A bathing suit.","zh":"泳衣。"},"B":{"en":"Your own clothes.","zh":"你自己的衣服。"},"C":{"en":"Your underwear.","zh":"你的内衣。"},"D":{"en":"Nothing.","zh":"什么都不用。"}},"type":"short","tip":"⑩菲尔去日本公共澡堂，⑪什么都不用带，⑫顺便和邻居社交，⑬还互相搓背。","key":"什么都不用","tipType":"chain"},{"no":12,"answer":"C","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"To do business with others.","zh":"与他人做生意。"},"B":{"en":"To have a treatment of disease.","zh":"治疗疾病。"},"C":{"en":"To socialize with neighbors.","zh":"与邻居社交。"},"D":{"en":"To compete with neighbors.","zh":"与邻居竞争。"}},"type":"purpose","tip":"⑩菲尔去日本公共澡堂，⑪什么都不用带，⑫顺便和邻居社交，⑬还互相搓背。","key":"与邻居社交","tipType":"chain"},{"no":13,"answer":"B","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"Talking to friends.","zh":"和朋友聊天。"},"B":{"en":"Washing each other’s backs.","zh":"互相搓背。"},"C":{"en":"Drinking tea or juice.","zh":"喝茶或果汁。"},"D":{"en":"Watching TV.","zh":"看电视。"}},"type":"short","tip":"⑩菲尔去日本公共澡堂，⑪什么都不用带，⑫顺便和邻居社交，⑬还互相搓背。","key":"互相搓背","tipType":"chain"},{"no":14,"answer":"D","section":"C","group":"Passage One","range":[14,17],"options":{"A":{"en":"It will ring the alarm if we spend too much money.","zh":"如果我们花太多钱，它会发出警报。"},"B":{"en":"It will stop the payment if we spend money.","zh":"如果我们花钱，它会中止支付。"},"C":{"en":"It will give us an electric shock if we spend money.","zh":"如果我们花钱，它会给我们电击。"},"D":{"en":"It will give us an electric shock if we spend too much money.","zh":"如果我们花太多钱，它会给我们电击。"}},"type":"detail","tip":"⑭乱花钱它就电你，⑮255伏，⑯以后一切都联网，⑰人只买东西不看余额。","key":"如果我们花太多钱它会给我们电击","tipType":"chain"},{"no":15,"answer":"B","section":"C","group":"Passage One","range":[14,17],"options":{"A":{"en":"225 volt.","zh":"225 伏。"},"B":{"en":"255 volt.","zh":"255 伏。"},"C":{"en":"215 volt.","zh":"215 伏。"},"D":{"en":"525 volt.","zh":"525 伏。"}},"type":"number","tip":"⑭乱花钱它就电你，⑮255伏，⑯以后一切都联网，⑰人只买东西不看余额。","key":"255 伏","tipType":"chain"},{"no":16,"answer":"C","section":"C","group":"Passage One","range":[14,17],"options":{"A":{"en":"People’s willpower is too weak.","zh":"人们的意志力太薄弱。"},"B":{"en":"Everything in our life can be control by technology.","zh":"我们生活中的一切都能被技术控制。"},"C":{"en":"Everything in our life will be connected to the Internet.","zh":"我们生活中的一切都将连接到互联网。"},"D":{"en":"Science can improve willpower.","zh":"科学能够增强意志力。"}},"type":"detail","tip":"⑭乱花钱它就电你，⑮255伏，⑯以后一切都联网，⑰人只买东西不看余额。","key":"我们生活中的一切都将连接到互联网","tipType":"chain"},{"no":17,"answer":"B","section":"C","group":"Passage One","range":[14,17],"options":{"A":{"en":"People buy things after checking how much money they have in their bank.","zh":"人们在确认银行里有多少钱之后才买东西。"},"B":{"en":"People buy things rather than look at the balance they have in their bank.","zh":"人们只管买东西，而不看银行余额。"},"C":{"en":"People will run away when they have to pay for expensive things.","zh":"当需要为昂贵的东西付钱时，人们会逃开。"},"D":{"en":"People buy things rather than look at the price tag of the products.","zh":"人们只管买东西，而不看商品的价格标签。"}},"type":"detail","tip":"⑭乱花钱它就电你，⑮255伏，⑯以后一切都联网，⑰人只买东西不看余额。","key":"人们只管买东西而不看银行余额","tipType":"chain"},{"no":18,"answer":"D","section":"C","group":"Passage Two","range":[18,21],"options":{"A":{"en":"Weapons.","zh":"武器。"},"B":{"en":"Military.","zh":"军事。"},"C":{"en":"Finance.","zh":"金融。"},"D":{"en":"Fashion.","zh":"时尚。"}},"type":"short","tip":"⑱俄罗斯的时尚，⑲没人买他们的武器了，⑳只能靠造枪，㉑爱国主义情绪高涨。","key":"时尚","tipType":"chain"},{"no":19,"answer":"D","section":"C","group":"Passage Two","range":[18,21],"options":{"A":{"en":"Because the Russian government stopped the company’s weapon business.","zh":"因为俄罗斯政府叫停了该公司的武器业务。"},"B":{"en":"Because less people want to buy hunting and sporting weapons.","zh":"因为想购买狩猎和运动武器的人变少了。"},"C":{"en":"Because fashion industry is more profitable than weapons.","zh":"因为时尚行业比武器更赚钱。"},"D":{"en":"Because many countries stopped buying their weapons.","zh":"因为许多国家不再购买他们的武器。"}},"type":"reason","tip":"⑱俄罗斯的时尚，⑲没人买他们的武器了，⑳只能靠造枪，㉑爱国主义情绪高涨。","key":"因为许多国家不再购买他们的武器","tipType":"chain"},{"no":20,"answer":"A","section":"C","group":"Passage Two","range":[18,21],"options":{"A":{"en":"From making guns.","zh":"靠制造枪支。"},"B":{"en":"From making clothes.","zh":"靠制作服装。"},"C":{"en":"From new products.","zh":"靠新产品。"},"D":{"en":"From selling accessories.","zh":"靠销售配饰。"}},"type":"short","tip":"⑱俄罗斯的时尚，⑲没人买他们的武器了，⑳只能靠造枪，㉑爱国主义情绪高涨。","key":"靠制造枪支","tipType":"chain"},{"no":21,"answer":"B","section":"C","group":"Passage Two","range":[18,21],"options":{"A":{"en":"Because the images of tanks on them.","zh":"因为上面印着坦克的图案。"},"B":{"en":"Because of a rise in patriotism in Russia.","zh":"因为俄罗斯爱国主义情绪高涨。"},"C":{"en":"Because of the Western sanctions.","zh":"因为西方的制裁。"},"D":{"en":"Because it is cheaper than other brands.","zh":"因为它比其他品牌便宜。"}},"type":"reason","tip":"⑱俄罗斯的时尚，⑲没人买他们的武器了，⑳只能靠造枪，㉑爱国主义情绪高涨。","key":"因为俄罗斯爱国主义情绪高涨","tipType":"chain"},{"no":22,"answer":"C","section":"C","group":"Passage Three","range":[22,24],"options":{"A":{"en":"From petrol.","zh":"来自汽油。"},"B":{"en":"From electric battery.","zh":"来自电池。"},"C":{"en":"From sun’s ray.","zh":"来自阳光。"},"D":{"en":"From natural gas.","zh":"来自天然气。"}},"type":"short","tip":"㉒电来自阳光，㉓撑了118小时，㉔就为展示清洁技术。","key":"来自阳光","tipType":"chain"},{"no":23,"answer":"C","section":"C","group":"Passage Three","range":[22,24],"options":{"A":{"en":"67 hours.","zh":"67 小时。"},"B":{"en":"76 hours.","zh":"76 小时。"},"C":{"en":"118 hours.","zh":"118 小时。"},"D":{"en":"180 hours.","zh":"180 小时。"}},"type":"number","tip":"㉒电来自阳光，㉓撑了118小时，㉔就为展示清洁技术。","key":"118 小时","tipType":"chain"},{"no":24,"answer":"D","section":"C","group":"Passage Three","range":[22,24],"options":{"A":{"en":"To make a new history.","zh":"创造新的历史。"},"B":{"en":"To make world records.","zh":"创造世界纪录。"},"C":{"en":"To change the climate.","zh":"改变气候。"},"D":{"en":"To show what we can do with clean technologies.","zh":"展示清洁技术能做到什么。"}},"type":"purpose","tip":"㉒电来自阳光，㉓撑了118小时，㉔就为展示清洁技术。","key":"展示清洁技术能做到什么","tipType":"chain"}]},{"id":3,"title":"第3套","questions":[{"no":1,"answer":"B","section":"A","group":null,"range":null,"options":{"A":{"en":"They should keep going.","zh":"他们应该继续赶路。"},"B":{"en":"They should stop and have a cup of coffee.","zh":"他们应该停下来喝杯咖啡。"},"C":{"en":"They should stop and have a cup of tea.","zh":"他们应该停下来喝杯茶。"},"D":{"en":"They shouldn’t stop to have a cup to coffee.","zh":"他们不应该停下来喝咖啡。"}},"type":"attitude","tip":"记：走累了，坐下喝杯咖啡。","key":"他们应该停下来喝杯咖啡","tipType":"hook"},{"no":2,"answer":"D","section":"A","group":null,"range":null,"options":{"A":{"en":"12:30.","zh":"12 点 30 分"},"B":{"en":"13:30.","zh":"13 点 30 分"},"C":{"en":"12:00.","zh":"12 点 00 分"},"D":{"en":"13:00.","zh":"13 点 00 分"}},"type":"number","tip":"记：13:00，下午一点整。","key":"13 点 00 分","tipType":"hook"},{"no":3,"answer":"B","section":"A","group":null,"range":null,"options":{"A":{"en":"Because it will be too hot.","zh":"因为天气会太热。"},"B":{"en":"Because there will be a storm.","zh":"因为会有一场暴风雨。"},"C":{"en":"Because they haven’t got prepared yet.","zh":"因为他们还没做好准备。"},"D":{"en":"Because it will be cloudy.","zh":"因为天气会是多云。"}},"type":"reason","tip":"记：乌云压顶，暴风雨要来。","key":"因为会有一场暴风雨","tipType":"hook"},{"no":4,"answer":"C","section":"A","group":null,"range":null,"options":{"A":{"en":"He will be in the computer science class with the woman.","zh":"他会和这位女士一起上计算机课。"},"B":{"en":"He does not like computer science.","zh":"他不喜欢计算机科学。"},"C":{"en":"He did not get the chance to take this course.","zh":"他没有机会选这门课。"},"D":{"en":"He will take the course online.","zh":"他会在网上修这门课。"}},"type":"detail","tip":"记：手慢一步，就没机会选这门课。","key":"他没有机会选这门课","tipType":"hook"},{"no":5,"answer":"D","section":"A","group":null,"range":null,"options":{"A":{"en":"He has no idea.","zh":"他不知道。"},"B":{"en":"It will be raining soon.","zh":"很快就要下雨了。"},"C":{"en":"It is not raining.","zh":"现在没有下雨。"},"D":{"en":"It is raining heavily.","zh":"雨下得很大。"}},"type":"short","tip":"记：雨下得很大，门都出不去。","key":"雨下得很大","tipType":"hook"},{"no":6,"answer":"A","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"He has bought too much.","zh":"他买得太多了。"},"B":{"en":"He has bought all the essentials they need.","zh":"他把他们需要的生活必需品都买齐了。"},"C":{"en":"He has not bought what she wants.","zh":"他没有买到她想要的东西。"},"D":{"en":"He does not know what to buy.","zh":"他不知道该买什么。"}},"type":"detail","tip":"⑥他买得太多，⑦狗还是别人送的，⑧这些对他没好处，⑨女士最后生气了。","key":"他买得太多了","tipType":"chain"},{"no":7,"answer":"B","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"Because it is on sale.","zh":"因为它在打折。"},"B":{"en":"Because he got a dog from someone else.","zh":"因为他的狗是别人送的。"},"C":{"en":"Because he bought a dog.","zh":"因为他买了一条狗。"},"D":{"en":"Because he is going to buy a dog for the woman.","zh":"因为他打算给这位女士买一条狗。"}},"type":"reason","tip":"⑥他买得太多，⑦狗还是别人送的，⑧这些对他没好处，⑨女士最后生气了。","key":"因为他的狗是别人送的","tipType":"chain"},{"no":8,"answer":"D","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"They can help the man to change his diet.","zh":"它们能帮助这位男士改变饮食。"},"B":{"en":"They are too expensive.","zh":"它们太贵了。"},"C":{"en":"They are something worth enjoying.","zh":"它们是值得享受的东西。"},"D":{"en":"They are not good for the man.","zh":"它们对这位男士没有好处。"}},"type":"detail","tip":"⑥他买得太多，⑦狗还是别人送的，⑧这些对他没好处，⑨女士最后生气了。","key":"它们对这位男士没有好处","tipType":"chain"},{"no":9,"answer":"C","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"The woman loves the dog very much.","zh":"这位女士非常喜欢那条狗。"},"B":{"en":"The woman will do shopping herself.","zh":"这位女士会自己去购物。"},"C":{"en":"The woman is angry in the end.","zh":"这位女士最后生气了。"},"D":{"en":"The woman will cook the steak for dinner.","zh":"这位女士晚餐会做牛排。"}},"type":"detail","tip":"⑥他买得太多，⑦狗还是别人送的，⑧这些对他没好处，⑨女士最后生气了。","key":"这位女士最后生气了","tipType":"chain"},{"no":10,"answer":"A","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"Because the weather report says it would rain.","zh":"因为天气预报说会下雨。"},"B":{"en":"Because they will go hiking tomorrow.","zh":"因为他们明天要去远足。"},"C":{"en":"Because it will be extremely hot tomorrow.","zh":"因为明天会非常热。"},"D":{"en":"Because she does not like camping at all.","zh":"因为她一点也不喜欢露营。"}},"type":"reason","tip":"⑩预报说会下雨，⑪可它从来不准，⑫干脆玩纸牌，⑬等天放晴。","key":"因为天气预报说会下雨","tipType":"chain"},{"no":11,"answer":"C","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"It is always right.","zh":"它总是很准。"},"B":{"en":"It is right sometimes.","zh":"它有时很准。"},"C":{"en":"It is never right.","zh":"它从来都不准。"},"D":{"en":"He does not listen to it at all.","zh":"他根本不听天气预报。"}},"type":"short","tip":"⑩预报说会下雨，⑪可它从来不准，⑫干脆玩纸牌，⑬等天放晴。","key":"它从来都不准","tipType":"chain"},{"no":12,"answer":"D","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"To sleep in the car.","zh":"在车里睡觉。"},"B":{"en":"To watch the stars.","zh":"看星星。"},"C":{"en":"To listen to the weather report.","zh":"听天气预报。"},"D":{"en":"To play a card game.","zh":"玩纸牌游戏。"}},"type":"purpose","tip":"⑩预报说会下雨，⑪可它从来不准，⑫干脆玩纸牌，⑬等天放晴。","key":"玩纸牌游戏","tipType":"chain"},{"no":13,"answer":"C","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"Go home.","zh":"回家。"},"B":{"en":"Go on hiking with their raincoats on.","zh":"穿着雨衣继续远足。"},"C":{"en":"Wait for the weather to be clear again.","zh":"等天气再次放晴。"},"D":{"en":"Find a hotel and spend the night there.","zh":"找一家旅馆在那里过夜。"}},"type":"detail","tip":"⑩预报说会下雨，⑪可它从来不准，⑫干脆玩纸牌，⑬等天放晴。","key":"等天气再次放晴","tipType":"chain"},{"no":14,"answer":"D","section":"C","group":"Passage One","range":[14,16],"options":{"A":{"en":"SpaceX.","zh":"太空探索技术公司（SpaceX）。"},"B":{"en":"Tesla Motors.","zh":"特斯拉汽车公司。"},"C":{"en":"PayPal.","zh":"贝宝（PayPal）。"},"D":{"en":"OpenAI Gym.","zh":"OpenAI Gym（AI测试平台）。"}},"type":"short","tip":"⑭OpenAI Gym，⑮一个有AI教练的健身房，⑯要做的是多任务算法。","key":"OpenAI Gym（AI测试平台）","tipType":"chain"},{"no":15,"answer":"A","section":"C","group":"Passage One","range":[14,16],"options":{"A":{"en":"It is a gym with AI coaches.","zh":"它是一个有AI教练的健身房。"},"B":{"en":"It is a website for code writers to publish their AI research results.","zh":"它是一个供程序员发布AI研究成果的网站。"},"C":{"en":"It is a gym for robots to work out.","zh":"它是一个供机器人锻炼的健身房。"},"D":{"en":"It is an open platform for researchers to test their ideas for AI.","zh":"它是一个供研究人员测试AI想法的开放平台。"}},"type":"detail","tip":"⑭OpenAI Gym，⑮一个有AI教练的健身房，⑯要做的是多任务算法。","key":"它是一个有AI教练的健身房","tipType":"chain"},{"no":16,"answer":"A","section":"C","group":"Passage One","range":[14,16],"options":{"A":{"en":"To develop a multi-task algorithm.","zh":"开发一种多任务算法。"},"B":{"en":"To develop an algorithm that is good at everything.","zh":"开发一种样样都擅长的算法。"},"C":{"en":"To build a multi-task robot.","zh":"制造一个多任务机器人。"},"D":{"en":"To recruit the most talent code writers in the world.","zh":"招募世界上最优秀的人才来写代码。"}},"type":"purpose","tip":"⑭OpenAI Gym，⑮一个有AI教练的健身房，⑯要做的是多任务算法。","key":"开发一种多任务算法","tipType":"chain"},{"no":17,"answer":"C","section":"C","group":"Passage Two","range":[17,19],"options":{"A":{"en":"People don’t like equivalent gains.","zh":"人们不喜欢等量的收益。"},"B":{"en":"People are not afraid to lose.","zh":"人们不怕失去。"},"C":{"en":"People hate to lose.","zh":"人们讨厌失去。"},"D":{"en":"People are prone to equivalent gains.","zh":"人们容易偏向等量的收益。"}},"type":"detail","tip":"⑰人最怕失去，⑱把脚搭在桌上，⑲摆强势姿势的更多去赌。","key":"人们讨厌失去","tipType":"chain"},{"no":18,"answer":"A","section":"C","group":"Passage Two","range":[17,19],"options":{"A":{"en":"Resting the feet on top of a table.","zh":"把脚搭在桌子上。"},"B":{"en":"Placing the feet on the floor.","zh":"把脚放在地板上。"},"C":{"en":"Placing the hands behind the body.","zh":"把双手放在身后。"},"D":{"en":"Crossing their arms and legs.","zh":"双臂交叉、双腿交叠。"}},"type":"detail","tip":"⑰人最怕失去，⑱把脚搭在桌上，⑲摆强势姿势的更多去赌。","key":"把脚搭在桌子上","tipType":"chain"},{"no":19,"answer":"D","section":"C","group":"Passage Two","range":[17,19],"options":{"A":{"en":"The number of people who chose to gamble in the two groups is equal.","zh":"两组中选择赌博的人数相同。"},"B":{"en":"More people with power poses chose not to gamble.","zh":"保持强势姿势的人中更多人选择不赌博。"},"C":{"en":"More people in the second group took the gamble.","zh":"第二组中更多人参与了赌博。"},"D":{"en":"More people with power poses took the gamble.","zh":"保持强势姿势的人中更多人参与了赌博。"}},"type":"detail","tip":"⑰人最怕失去，⑱把脚搭在桌上，⑲摆强势姿势的更多去赌。","key":"保持强势姿势的人中更多人参与了赌博","tipType":"chain"},{"no":20,"answer":"C","section":"C","group":"Passage Three","range":[20,22],"options":{"A":{"en":"She is the guard dog of the baseball team.","zh":"她是棒球队的看门狗。"},"B":{"en":"She is the pet of the baseball team’s president.","zh":"她是棒球队主席的宠物。"},"C":{"en":"She is the ‘bat dog’ of the baseball team.","zh":"她是棒球队的“捡球棒狗”。"},"D":{"en":"She is the mascot of the baseball team.","zh":"她是棒球队的吉祥物。"}},"type":"detail","tip":"⑳她是棒球队的捡球棒狗，㉑专逗裁判笑，㉒被发现时身上没证件。","key":"她是棒球队的捡球棒狗","tipType":"chain"},{"no":21,"answer":"C","section":"C","group":"Passage Three","range":[20,22],"options":{"A":{"en":"Pleasing the crowd.","zh":"逗观众开心。"},"B":{"en":"Taking baseball bats to players.","zh":"给球员送球棒。"},"C":{"en":"Amusing the judge.","zh":"逗乐裁判。"},"D":{"en":"Collecting balls on the field.","zh":"在球场上捡球。"}},"type":"detail","tip":"⑳她是棒球队的捡球棒狗，㉑专逗裁判笑，㉒被发现时身上没证件。","key":"逗乐裁判","tipType":"chain"},{"no":22,"answer":"A","section":"C","group":"Passage Three","range":[20,22],"options":{"A":{"en":"She had nothing to identify her when she was found.","zh":"她被找到时身上没有任何能证明身份的东西。"},"B":{"en":"The puppy is only 8 weeks old.","zh":"这只幼犬只有8周大。"},"C":{"en":"She is a strong big dog.","zh":"她是一条强壮的大狗。"},"D":{"en":"She greets visitors every weekday at the team’s office.","zh":"她每个工作日都在球队办公室迎接访客。"}},"type":"detail","tip":"⑳她是棒球队的捡球棒狗，㉑专逗裁判笑，㉒被发现时身上没证件。","key":"她被找到时身上没有任何能证明身份的东西","tipType":"chain"}]},{"id":4,"title":"第4套","questions":[{"no":1,"answer":"C","section":"A","group":null,"range":null,"options":{"A":{"en":"He has finish reading the woman’s paper.","zh":"他已经读完了这位女士的论文。"},"B":{"en":"He doesn’t like the paper.","zh":"他不喜欢这篇论文。"},"C":{"en":"He hasn’t read the paper yet.","zh":"他还没有读这篇论文。"},"D":{"en":"He will read the paper at the end of the term.","zh":"他会在学期末读这篇论文。"}},"type":"detail","tip":"记：论文摊在桌上，一行没读。","key":"他还没有读这篇论文","tipType":"hook"},{"no":2,"answer":"B","section":"A","group":null,"range":null,"options":{"A":{"en":"Because you will always have new friends.","zh":"因为你总会结交新朋友。"},"B":{"en":"Because people move a lot.","zh":"因为人们经常搬家。"},"C":{"en":"Because people today do not like friends.","zh":"因为现在的人不喜欢交朋友。"},"D":{"en":"Because people forget each other when they are apart.","zh":"因为人们分开后就会彼此遗忘。"}},"type":"reason","tip":"记：总搬家，东西自然找不着。","key":"因为人们经常搬家","tipType":"hook"},{"no":3,"answer":"C","section":"A","group":null,"range":null,"options":{"A":{"en":"He is not going to help the woman.","zh":"他不打算帮这位女士。"},"B":{"en":"The box is quite light.","zh":"箱子很轻。"},"C":{"en":"The box is very heavy.","zh":"箱子很重。"},"D":{"en":"He thinks the woman can do it by herself.","zh":"他认为这位女士自己能行。"}},"type":"detail","tip":"记：箱子死沉，抬都抬不动。","key":"箱子很重","tipType":"hook"},{"no":4,"answer":"D","section":"A","group":null,"range":null,"options":{"A":{"en":"He thinks it is a bit difficult to shop online.","zh":"他认为网上购物有点难。"},"B":{"en":"He thinks people do not like online shopping.","zh":"他认为人们不喜欢网上购物。"},"C":{"en":"He thinks it is easy to make choices online.","zh":"他认为在网上做选择很容易。"},"D":{"en":"He thinks online shopping has some shortcomings.","zh":"他认为网上购物有一些缺点。"}},"type":"attitude","tip":"记：网上购物是便宜，缺点也不少。","key":"他认为网上购物有一些缺点","tipType":"hook"},{"no":5,"answer":"A","section":"A","group":null,"range":null,"options":{"A":{"en":"The woman doesn’t like red.","zh":"这位女士不喜欢红色。"},"B":{"en":"The woman doesn’t like white.","zh":"这位女士不喜欢白色。"},"C":{"en":"The white dress is too small for her.","zh":"那条白裙子对她来说太小了。"},"D":{"en":"The red dress fits her very well.","zh":"那条红裙子很适合她。"}},"type":"attitude","tip":"记：红色？她看一眼都嫌。","key":"这位女士不喜欢红色","tipType":"hook"},{"no":6,"answer":"D","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"She loves her father very much.","zh":"她非常爱她的父亲。"},"B":{"en":"She needs money.","zh":"她需要钱。"},"C":{"en":"She is joking.","zh":"她在开玩笑。"},"D":{"en":"She needs help.","zh":"她需要帮助。"}},"type":"short","tip":"⑥她需要帮忙，⑦东西在湖底，⑧他喜欢「父亲」发在脸书的内容，⑨其实他连脸书都不会用。","key":"她需要帮助","tipType":"chain"},{"no":7,"answer":"A","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"It is at the bottom at the lake.","zh":"它在湖底。"},"B":{"en":"It is taken by the girl’s boyfriend.","zh":"它是被女孩的男朋友拿走的。"},"C":{"en":"It is sold by the girl.","zh":"它是被女孩卖掉的。"},"D":{"en":"The girl cannot find it anywhere.","zh":"女孩到处都找不到它。"}},"type":"detail","tip":"⑥她需要帮忙，⑦东西在湖底，⑧他喜欢「父亲」发在脸书的内容，⑨其实他连脸书都不会用。","key":"它在湖底","tipType":"chain"},{"no":8,"answer":"C","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"He and 20 of his friends will come to her father.","zh":"他和他的20个朋友会来找她的父亲。"},"B":{"en":"He was a member of a gang.","zh":"他曾是帮派成员。"},"C":{"en":"He loves the things he thought the father posted on his Facebook page.","zh":"他很喜欢他以为父亲发在脸书上的那些内容。"},"D":{"en":"He will get to the girl’s house in about 20 minutes.","zh":"他大约20分钟后会到女孩家。"}},"type":"detail","tip":"⑥她需要帮忙，⑦东西在湖底，⑧他喜欢「父亲」发在脸书的内容，⑨其实他连脸书都不会用。","key":"他很喜欢他以为父亲发在脸书上的那些内容","tipType":"chain"},{"no":9,"answer":"B","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"He doesn’t know Facebook at all.","zh":"他完全不知道脸书是什么。"},"B":{"en":"He doesn’t know how to use Facebook.","zh":"他不知道怎么用脸书。"},"C":{"en":"He uses Facebook every day.","zh":"他每天都用脸书。"},"D":{"en":"He posts something on the girl’s boyfriend’s Facebook page.","zh":"他在女孩男友的脸书主页上发了些东西。"}},"type":"detail","tip":"⑥她需要帮忙，⑦东西在湖底，⑧他喜欢「父亲」发在脸书的内容，⑨其实他连脸书都不会用。","key":"他不知道怎么用脸书","tipType":"chain"},{"no":10,"answer":"C","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"80 mph.","zh":"每小时80英里。"},"B":{"en":"50 mph.","zh":"每小时50英里。"},"C":{"en":"20 mph.","zh":"每小时20英里。"},"D":{"en":"10 mph.","zh":"每小时10英里。"}},"type":"number","tip":"⑩时速20英里，⑪他求警察放他一马，⑫数字5，⑬警察与司机。","key":"每小时20英里","tipType":"chain"},{"no":11,"answer":"A","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"He wants the woman to let him go without any punishment.","zh":"他希望这位女士放他走，不受任何处罚。"},"B":{"en":"He wants the woman to contact Fred Smith.","zh":"他希望这位女士联系弗雷德·史密斯。"},"C":{"en":"He wants to know if Fred is still working in the police department.","zh":"他想知道弗雷德是否还在警察局工作。"},"D":{"en":"He wants the woman to know that Fred is the one to blame.","zh":"他想让这位女士知道该怪的是弗雷德。"}},"type":"detail","tip":"⑩时速20英里，⑪他求警察放他一马，⑫数字5，⑬警察与司机。","key":"他希望这位女士放他走不受任何处罚","tipType":"chain"},{"no":12,"answer":"C","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"3.","zh":""},"B":{"en":"4.","zh":""},"C":{"en":"5.","zh":"5"},"D":{"en":"6.","zh":""}},"type":"number","tip":"⑩时速20英里，⑪他求警察放他一马，⑫数字5，⑬警察与司机。","key":"","tipType":"chain"},{"no":13,"answer":"B","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"Judge and the defendant.","zh":"法官与被告。"},"B":{"en":"Police officer and driver.","zh":"警察与司机。"},"C":{"en":"Mechanic and driver.","zh":"修理工与司机。"},"D":{"en":"Teacher and student.","zh":"老师与学生。"}},"type":"relation","tip":"⑩时速20英里，⑪他求警察放他一马，⑫数字5，⑬警察与司机。","key":"警察与司机","tipType":"chain"},{"no":14,"answer":"C","section":"C","group":"Passage One","range":[14,17],"options":{"A":{"en":"Because they don’t eat properly.","zh":"因为他们饮食不当。"},"B":{"en":"Because they eat too much.","zh":"因为他们吃得太多。"},"C":{"en":"Because they are either overweight or underweight.","zh":"因为他们要么超重，要么体重过轻。"},"D":{"en":"Because they eat too little.","zh":"因为他们吃得太少。"}},"type":"reason","tip":"⑭要么超重要么过轻，⑮这些人得不到足够医疗帮助，⑯她不愿为饮食去看医生，⑰725,000。","key":"因为他们要么超重要么体重过轻","tipType":"chain"},{"no":15,"answer":"B","section":"C","group":"Passage One","range":[14,17],"options":{"A":{"en":"The medical treatment for those people is not appropriate.","zh":"为这些人提供的治疗并不合适。"},"B":{"en":"There is not enough medical help for people having the problem.","zh":"有这个问题的人得不到足够的医疗帮助。"},"C":{"en":"There is not effective treatment for people with the problem.","zh":"对有这个问题的人来说没有有效的治疗方法。"},"D":{"en":"People don’t pay much attention to the problem.","zh":"人们不太关注这个问题。"}},"type":"detail","tip":"⑭要么超重要么过轻，⑮这些人得不到足够医疗帮助，⑯她不愿为饮食去看医生，⑰725,000。","key":"有这个问题的人得不到足够的医疗帮助","tipType":"chain"},{"no":16,"answer":"D","section":"C","group":"Passage One","range":[14,17],"options":{"A":{"en":"Because the symptom is not obvious.","zh":"因为症状不明显。"},"B":{"en":"Because it is not a common problem for women.","zh":"因为这对女性来说不是常见问题。"},"C":{"en":"Because more men have eating problems than women.","zh":"因为有饮食问题的男性比女性多。"},"D":{"en":"Because she is not willing to go to a doctor for eating problems.","zh":"因为她不愿因饮食问题去看医生。"}},"type":"reason","tip":"⑭要么超重要么过轻，⑮这些人得不到足够医疗帮助，⑯她不愿为饮食去看医生，⑰725,000。","key":"因为她不愿因饮食问题去看医生","tipType":"chain"},{"no":17,"answer":"D","section":"C","group":"Passage One","range":[14,17],"options":{"A":{"en":"10,000.","zh":""},"B":{"en":"7,250.","zh":""},"C":{"en":"72,500.","zh":""},"D":{"en":"725,000.","zh":"725,000"}},"type":"number","tip":"⑭要么超重要么过轻，⑮这些人得不到足够医疗帮助，⑯她不愿为饮食去看医生，⑰725,000。","key":"","tipType":"chain"},{"no":18,"answer":"B","section":"C","group":"Passage Two","range":[18,20],"options":{"A":{"en":"The facts around a 4-year-old boy falling into the ape’s enclosure.","zh":"一名4岁男孩掉进猿类围栏的事件经过。"},"B":{"en":"The facts around the shooting of a gorilla at a zoo.","zh":"动物园一只大猩猩被枪杀的事件经过。"},"C":{"en":"Whether the gorilla hurt the boy or not.","zh":"大猩猩是否伤害了那个男孩。"},"D":{"en":"Who should be responsible for the shooting?","zh":"谁应该为这次枪击负责？"}},"type":"detail","tip":"⑱大猩猩被枪杀，⑲大家说该用麻醉枪，⑳母亲和动物园都该负责。","key":"动物园一只大猩猩被枪杀的事件经过","tipType":"chain"},{"no":19,"answer":"C","section":"C","group":"Passage Two","range":[18,20],"options":{"A":{"en":"They think zookeepers should put the boy to sleep.","zh":"他们认为动物园管理员应该让男孩安乐死。"},"B":{"en":"They can understand the reaction of the zoo.","zh":"他们能理解动物园的反应。"},"C":{"en":"They think zookeepers should have used a tranquilizer gun.","zh":"他们认为动物园管理员本该使用麻醉枪。"},"D":{"en":"They are angry with the boy.","zh":"他们对那个男孩感到愤怒。"}},"type":"attitude","tip":"⑱大猩猩被枪杀，⑲大家说该用麻醉枪，⑳母亲和动物园都该负责。","key":"他们认为动物园管理员本该使用麻醉枪","tipType":"chain"},{"no":20,"answer":"B","section":"C","group":"Passage Two","range":[18,20],"options":{"A":{"en":"The boy’s mother and the zookeepers should be sentenced to death.","zh":"男孩的母亲和动物园管理员应被判处死刑。"},"B":{"en":"The boy’s mother and the zoo should be responsible for the gorilla’s death.","zh":"男孩的母亲和动物园应该为大猩猩的死负责。"},"C":{"en":"The boy and the zoo should be responsible for the gorilla’s death.","zh":"男孩和动物园应该为大猩猩的死负责。"},"D":{"en":"Young children should be banned from getting near the ape’s enclosure in the future.","zh":"今后应禁止幼童靠近猿类围栏。"}},"type":"attitude","tip":"⑱大猩猩被枪杀，⑲大家说该用麻醉枪，⑳母亲和动物园都该负责。","key":"男孩的母亲和动物园应该为大猩猩的死负责","tipType":"chain"},{"no":21,"answer":"C","section":"C","group":"Passage Three","range":[21,24],"options":{"A":{"en":"Youth employment situation around the world.","zh":"全球青年就业状况。"},"B":{"en":"The influence of world’s financial collapse.","zh":"全球金融崩溃的影响。"},"C":{"en":"Youth unemployment problem around the world.","zh":"全球青年失业问题。"},"D":{"en":"World’s economic situation of the year.","zh":"当年的世界经济形势。"}},"type":"detail","tip":"㉑全球青年失业，㉒11.1%，㉓中东和北非最惨，㉔祸根是2008年金融危机。","key":"全球青年失业问题","tipType":"chain"},{"no":22,"answer":"A","section":"C","group":"Passage Three","range":[21,24],"options":{"A":{"en":"11.1%.","zh":"百分之 11.1"},"B":{"en":"10.6%.","zh":"百分之 10.6"},"C":{"en":"9.3%.","zh":"百分之 9.3"},"D":{"en":"16%.","zh":"百分之 16"}},"type":"number","tip":"㉑全球青年失业，㉒11.1%，㉓中东和北非最惨，㉔祸根是2008年金融危机。","key":"百分之 111","tipType":"chain"},{"no":23,"answer":"D","section":"C","group":"Passage Three","range":[21,24],"options":{"A":{"en":"Asia and Brazil.","zh":"亚洲和巴西。"},"B":{"en":"Middle East and South Africa.","zh":"中东和南非。"},"C":{"en":"Asia and South America.","zh":"亚洲和南美洲。"},"D":{"en":"Middle East and North Africa.","zh":"中东和北非。"}},"type":"detail","tip":"㉑全球青年失业，㉒11.1%，㉓中东和北非最惨，㉔祸根是2008年金融危机。","key":"中东和北非","tipType":"chain"},{"no":24,"answer":"C","section":"C","group":"Passage Three","range":[21,24],"options":{"A":{"en":"The education of young people.","zh":"年轻人的教育。"},"B":{"en":"Young people’s unwillingness to get a job.","zh":"年轻人不愿找工作。"},"C":{"en":"The global financial collapse of 2008.","zh":"2008 年全球金融危机。"},"D":{"en":"Different culture and religions in different countries.","zh":"不同国家有着不同的文化和宗教。"}},"type":"detail","tip":"㉑全球青年失业，㉒11.1%，㉓中东和北非最惨，㉔祸根是2008年金融危机。","key":"2008 年全球金融危机","tipType":"chain"}]},{"id":5,"title":"第5套","questions":[{"no":1,"answer":"C","section":"A","group":null,"range":null,"options":{"A":{"en":"A new computer is too expensive.","zh":"一台新电脑太贵了。"},"B":{"en":"The woman doesn’t need to buy a new computer.","zh":"这位女士不需要买新电脑。"},"C":{"en":"The woman should budget her money carefully.","zh":"这位女士应该仔细规划她的开支。"},"D":{"en":"The woman needs more clothes.","zh":"这位女士需要更多衣服。"}},"type":"detail","tip":"记：钱要算着花——仔细规划开支。","key":"这位女士应该仔细规划她的开支","tipType":"hook"},{"no":2,"answer":"B","section":"A","group":null,"range":null,"options":{"A":{"en":"Hotel.","zh":"酒店。"},"B":{"en":"Restaurant.","zh":"餐厅。"},"C":{"en":"Cinema.","zh":"电影院。"},"D":{"en":"Theater.","zh":"剧院。"}},"type":"short","tip":"记：约在哪儿？餐厅。","key":"餐厅","tipType":"hook"},{"no":3,"answer":"C","section":"A","group":null,"range":null,"options":{"A":{"en":"Maggie is still at home.","zh":"玛吉还在家里。"},"B":{"en":"He does not know Maggie.","zh":"他不认识玛吉。"},"C":{"en":"He knows Maggie for a long time.","zh":"他认识玛吉很久了。"},"D":{"en":"He is willing to know Maggie.","zh":"他愿意认识玛吉。"}},"type":"detail","tip":"记：玛吉？他认识好多年了。","key":"他认识玛吉很久了","tipType":"hook"},{"no":4,"answer":"B","section":"A","group":null,"range":null,"options":{"A":{"en":"He doesn’t know any interesting places in New York.","zh":"他不知道纽约有什么好玩的地方。"},"B":{"en":"He knows New York very well.","zh":"他对纽约非常熟悉。"},"C":{"en":"He doesn’t like New York.","zh":"他不喜欢纽约。"},"D":{"en":"He can go with the woman.","zh":"他可以和这位女士一起去。"}},"type":"detail","tip":"记：纽约哪条街他都门儿清。","key":"他对纽约非常熟悉","tipType":"hook"},{"no":5,"answer":"D","section":"A","group":null,"range":null,"options":{"A":{"en":"She thinks the man should grab the chance.","zh":"她认为这位男士应该抓住这个机会。"},"B":{"en":"She thinks the man will like the job.","zh":"她认为这位男士会喜欢这份工作。"},"C":{"en":"She thinks it is an excellent one.","zh":"她认为这是个绝佳的机会。"},"D":{"en":"She doesn’t think it is a good one.","zh":"她认为这不是个好机会。"}},"type":"attitude","tip":"记：机会？她摇头——不划算。","key":"她认为这不是个好机会","tipType":"hook"},{"no":6,"answer":"B","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"Teacher and student.","zh":"老师与学生。"},"B":{"en":"Classmates.","zh":"同学。"},"C":{"en":"Husband and wife.","zh":"夫妻。"},"D":{"en":"Colleagues.","zh":"同事。"}},"type":"relation","tip":"⑥同学，⑦他劝她保证充足睡眠，⑧数字8，⑨可她只睡不到5小时。","key":"同学","tipType":"chain"},{"no":7,"answer":"C","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"Getting more exercise.","zh":"多锻炼身体。"},"B":{"en":"Change his diet.","zh":"改变他的饮食。"},"C":{"en":"Having enough sleep.","zh":"保证充足的睡眠。"},"D":{"en":"Study harder.","zh":"更努力地学习。"}},"type":"short","tip":"⑥同学，⑦他劝她保证充足睡眠，⑧数字8，⑨可她只睡不到5小时。","key":"保证充足的睡眠","tipType":"chain"},{"no":8,"answer":"C","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"5.","zh":""},"B":{"en":"7.","zh":""},"C":{"en":"8.","zh":"8"},"D":{"en":"10.","zh":""}},"type":"number","tip":"⑥同学，⑦他劝她保证充足睡眠，⑧数字8，⑨可她只睡不到5小时。","key":"","tipType":"chain"},{"no":9,"answer":"D","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"8 hours.","zh":"8 小时。"},"B":{"en":"3 hours.","zh":"3 小时。"},"C":{"en":"More than 8 hours.","zh":"超过8小时。"},"D":{"en":"Less than 5 hours.","zh":"少于5小时。"}},"type":"short","tip":"⑥同学，⑦他劝她保证充足睡眠，⑧数字8，⑨可她只睡不到5小时。","key":"少于5小时","tipType":"chain"},{"no":10,"answer":"D","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"He doesn’t like his parents.","zh":"他不喜欢他的父母。"},"B":{"en":"He is not feeling well.","zh":"他身体不舒服。"},"C":{"en":"He doesn’t want to tell the woman.","zh":"他不想告诉这位女士。"},"D":{"en":"He thinks his parents do love him.","zh":"他认为他的父母确实爱他。"}},"type":"attitude","tip":"⑩父母是真爱他，⑪手机没问题，⑫他要的是独立，⑬这事只能他自己解决。","key":"他认为他的父母确实爱他","tipType":"chain"},{"no":11,"answer":"B","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"The man thinks it is not working.","zh":"这位男士认为它坏了。"},"B":{"en":"The woman thinks there is nothing wrong with the phone.","zh":"这位女士认为手机没有问题。"},"C":{"en":"The man thinks it is not as good as his other phone.","zh":"这位男士认为它不如他的另一部手机。"},"D":{"en":"The woman thinks it is too old.","zh":"这位女士认为它太旧了。"}},"type":"attitude","tip":"⑩父母是真爱他，⑪手机没问题，⑫他要的是独立，⑬这事只能他自己解决。","key":"这位女士认为手机没有问题","tipType":"chain"},{"no":12,"answer":"D","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"To be happy.","zh":"快乐。"},"B":{"en":"To be loved.","zh":"被爱。"},"C":{"en":"To be self-confident.","zh":"自信。"},"D":{"en":"To be independent.","zh":"独立。"}},"type":"purpose","tip":"⑩父母是真爱他，⑪手机没问题，⑫他要的是独立，⑬这事只能他自己解决。","key":"独立","tipType":"chain"},{"no":13,"answer":"A","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"Only the man himself can solve the problem.","zh":"只有这位男士自己能解决这个问题。"},"B":{"en":"The man doesn’t need to worry.","zh":"这位男士不必担心。"},"C":{"en":"The man should talk to his parents again.","zh":"这位男士应该再和他的父母谈谈。"},"D":{"en":"She can help him to solve the problem.","zh":"她可以帮他解决这个问题。"}},"type":"detail","tip":"⑩父母是真爱他，⑪手机没问题，⑫他要的是独立，⑬这事只能他自己解决。","key":"只有这位男士自己能解决这个问题","tipType":"chain"},{"no":14,"answer":"A","section":"C","group":"Passage One","range":[14,16],"options":{"A":{"en":"It will stop French people from listening to the radio.","zh":"它会阻止法国人听广播。"},"B":{"en":"It can protect French musicians.","zh":"它能保护法国的音乐人。"},"C":{"en":"It can help French artists to make a career out of music.","zh":"它能帮助法国艺术家以音乐为业。"},"D":{"en":"It will make French people listen to more songs in French.","zh":"它会让法国人听更多法语歌曲。"}},"type":"detail","tip":"⑭怕法国人听不成广播，⑮要挡住英语渗入，⑯发言人说法新法必要。","key":"它会阻止法国人听广播","tipType":"chain"},{"no":15,"answer":"B","section":"C","group":"Passage One","range":[14,16],"options":{"A":{"en":"To protect its culture from European cultures.","zh":"保护本国文化不受其他欧洲文化的影响。"},"B":{"en":"To stop the English language from getting deeper into French culture.","zh":"阻止英语更深入地渗入法国文化。"},"C":{"en":"To encourage more people in the world to learn French.","zh":"鼓励世界上更多人学习法语。"},"D":{"en":"To make French the most popular language in the world.","zh":"让法语成为世界上最流行的语言。"}},"type":"purpose","tip":"⑭怕法国人听不成广播，⑮要挡住英语渗入，⑯发言人说法新法必要。","key":"阻止英语更深入地渗入法国文化","tipType":"chain"},{"no":16,"answer":"D","section":"C","group":"Passage One","range":[14,16],"options":{"A":{"en":"A union for French musicians said the law could not help to protect French musicians.","zh":"法国音乐人联合会表示，该法律无法保护法国音乐人。"},"B":{"en":"The French music industry is holding a protest against the new law.","zh":"法国音乐界正在举行抗议新法的活动。"},"C":{"en":"A spokesman for the French music industry said the new law is unnecessary.","zh":"法国音乐界的一位发言人表示新法没有必要。"},"D":{"en":"A spokesman for the French music industry said the new law is necessary.","zh":"法国音乐界的一位发言人表示新法是必要的。"}},"type":"detail","tip":"⑭怕法国人听不成广播，⑮要挡住英语渗入，⑯发言人说法新法必要。","key":"法国音乐界的一位发言人表示新法是必要的","tipType":"chain"},{"no":17,"answer":"C","section":"C","group":"Passage Two","range":[17,19],"options":{"A":{"en":"People don’t like equivalent gains.","zh":"人们不喜欢等量的收益。"},"B":{"en":"People are not afraid to lose.","zh":"人们不怕失去。"},"C":{"en":"People hate to lose.","zh":"人们讨厌失去。"},"D":{"en":"People are prone to equivalent gains.","zh":"人们容易偏向等量的收益。"}},"type":"detail","tip":"⑰人最怕失去，⑱把脚搭在桌上，⑲摆强势姿势的更多去赌。","key":"人们讨厌失去","tipType":"chain"},{"no":18,"answer":"A","section":"C","group":"Passage Two","range":[17,19],"options":{"A":{"en":"Resting the feet on top of a table.","zh":"把脚搭在桌子上。"},"B":{"en":"Placing the feet on the floor.","zh":"把脚放在地板上。"},"C":{"en":"Placing the hands behind the body.","zh":"把双手放在身后。"},"D":{"en":"Crossing their arms and legs.","zh":"双臂交叉、双腿交叠。"}},"type":"detail","tip":"⑰人最怕失去，⑱把脚搭在桌上，⑲摆强势姿势的更多去赌。","key":"把脚搭在桌子上","tipType":"chain"},{"no":19,"answer":"D","section":"C","group":"Passage Two","range":[17,19],"options":{"A":{"en":"The number of people who chose to gamble in the two groups is equal.","zh":"两组中选择赌博的人数相同。"},"B":{"en":"More people with power poses chose not to gamble.","zh":"保持强势姿势的人中更多人选择不赌博。"},"C":{"en":"More people in the second group took the gamble.","zh":"第二组中更多人参与了赌博。"},"D":{"en":"More people with power poses took the gamble.","zh":"保持强势姿势的人中更多人参与了赌博。"}},"type":"detail","tip":"⑰人最怕失去，⑱把脚搭在桌上，⑲摆强势姿势的更多去赌。","key":"保持强势姿势的人中更多人参与了赌博","tipType":"chain"},{"no":20,"answer":"C","section":"C","group":"Passage Three","range":[20,22],"options":{"A":{"en":"From petrol.","zh":"来自汽油。"},"B":{"en":"From electric battery.","zh":"来自电池。"},"C":{"en":"From sun’s ray.","zh":"来自阳光。"},"D":{"en":"From natural gas.","zh":"来自天然气。"}},"type":"short","tip":"⑳电来自阳光，㉑撑了118小时，㉒就为展示清洁技术。","key":"来自阳光","tipType":"chain"},{"no":21,"answer":"C","section":"C","group":"Passage Three","range":[20,22],"options":{"A":{"en":"67 hours.","zh":"67 小时。"},"B":{"en":"76 hours.","zh":"76 小时。"},"C":{"en":"118 hours.","zh":"118 小时。"},"D":{"en":"180 hours.","zh":"180 小时。"}},"type":"number","tip":"⑳电来自阳光，㉑撑了118小时，㉒就为展示清洁技术。","key":"118 小时","tipType":"chain"},{"no":22,"answer":"D","section":"C","group":"Passage Three","range":[20,22],"options":{"A":{"en":"To make a new history.","zh":"创造新的历史。"},"B":{"en":"To make world records.","zh":"创造世界纪录。"},"C":{"en":"To change the climate.","zh":"改变气候。"},"D":{"en":"To show what we can do with clean technologies.","zh":"展示清洁技术能做到什么。"}},"type":"purpose","tip":"⑳电来自阳光，㉑撑了118小时，㉒就为展示清洁技术。","key":"展示清洁技术能做到什么","tipType":"chain"}]},{"id":6,"title":"第6套","questions":[{"no":1,"answer":"D","section":"A","group":null,"range":null,"options":{"A":{"en":"It means you have to wear a tie.","zh":"意思是必须打领带。"},"B":{"en":"It means you can wear T-shirts.","zh":"意思是你可以穿T恤。"},"C":{"en":"It means you can wear anything you like.","zh":"意思是你可以穿任何喜欢的衣服。"},"D":{"en":"It means you can wear a shirt without a tie.","zh":"意思是你可以穿衬衫而不打领带。"}},"type":"detail","tip":"记：衬衫照穿，领带免了。","key":"意思是你可以穿衬衫而不打领带","tipType":"hook"},{"no":2,"answer":"C","section":"A","group":null,"range":null,"options":{"A":{"en":"The woman will pay for the sandwich.","zh":"这位女士会付三明治的钱。"},"B":{"en":"The woman will buy a new wallet.","zh":"这位女士会买一个新钱包。"},"C":{"en":"The man will pay for the sandwich.","zh":"这位男士会付三明治的钱。"},"D":{"en":"The man will buy the woman a new wallet.","zh":"这位男士会给这位女士买一个新钱包。"}},"type":"detail","tip":"记：三明治他请，钱包他掏。","key":"这位男士会付三明治的钱","tipType":"hook"},{"no":3,"answer":"B","section":"A","group":null,"range":null,"options":{"A":{"en":"Buy a new car.","zh":"买一辆新车。"},"B":{"en":"Have his car repaired.","zh":"把他的车修好。"},"C":{"en":"Ignore the noise.","zh":"不理会那些噪音。"},"D":{"en":"Ask the woman to check his car out.","zh":"请这位女士帮他检查车。"}},"type":"short","tip":"记：先把车修好，别的再说。","key":"把他的车修好","tipType":"hook"},{"no":4,"answer":"A","section":"A","group":null,"range":null,"options":{"A":{"en":"The woman likes horror movies","zh":"这位女士喜欢恐怖片。"},"B":{"en":"The man likes horror movies.","zh":"这位男士喜欢恐怖片。"},"C":{"en":"The woman likes the movie.","zh":"这位女士喜欢这部电影。"},"D":{"en":"The man likes the movie.","zh":"这位男士喜欢这部电影。"}},"type":"attitude","tip":"记：她就好恐怖片这一口。","key":"这位女士喜欢恐怖片","tipType":"hook"},{"no":5,"answer":"B","section":"A","group":null,"range":null,"options":{"A":{"en":"2:35.","zh":"2 点 35 分"},"B":{"en":"2:45.","zh":"2 点 45 分"},"C":{"en":"2:30.","zh":"2 点 30 分"},"D":{"en":"2:50.","zh":"2 点 50 分"}},"type":"number","tip":"记：2:45，差一刻三点。","key":"2 点 45 分","tipType":"hook"},{"no":6,"answer":"C","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"Go to see a movie.","zh":"去看电影。"},"B":{"en":"Eat out.","zh":"出去吃饭。"},"C":{"en":"Cram for an exam.","zh":"突击备考。"},"D":{"en":"Have a birthday party for Sara.","zh":"为萨拉举办生日派对。"}},"type":"detail","tip":"⑥两人突击备考，⑦约在晚上7:30，⑧只能在家学习，⑨艾米怕是半夜才回。","key":"突击备考","tipType":"chain"},{"no":7,"answer":"C","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"11:30 P.M.","zh":"晚上11:30。"},"B":{"en":"10:30 P.M.","zh":"晚上10:30。"},"C":{"en":"7:30 P.M.","zh":"晚上7:30。"},"D":{"en":"6:30 P.M.","zh":"晚上6:30。"}},"type":"number","tip":"⑥两人突击备考，⑦约在晚上7:30，⑧只能在家学习，⑨艾米怕是半夜才回。","key":"晚上730","tipType":"chain"},{"no":8,"answer":"D","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"Go to work.","zh":"去上班。"},"B":{"en":"Hang out with Stuart.","zh":"和斯图尔特一起出去玩。"},"C":{"en":"Stay at home and relax.","zh":"待在家里放松。"},"D":{"en":"Study at home.","zh":"在家学习。"}},"type":"short","tip":"⑥两人突击备考，⑦约在晚上7:30，⑧只能在家学习，⑨艾米怕是半夜才回。","key":"在家学习","tipType":"chain"},{"no":9,"answer":"B","section":"B","group":"Conversation One","range":[6,9],"options":{"A":{"en":"Amy may end up staying at home.","zh":"艾米最后可能还是待在家里。"},"B":{"en":"Amy may come home at midnight.","zh":"艾米可能半夜才回家。"},"C":{"en":"Stuart will prepare for the test together with Amy.","zh":"斯图尔特会和艾米一起备考。"},"D":{"en":"Amy has a lot of friends and is always busy.","zh":"艾米朋友很多，总是很忙。"}},"type":"detail","tip":"⑥两人突击备考，⑦约在晚上7:30，⑧只能在家学习，⑨艾米怕是半夜才回。","key":"艾米可能半夜才回家","tipType":"chain"},{"no":10,"answer":"D","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"She loves her father very much.","zh":"她非常爱她的父亲。"},"B":{"en":"She needs money.","zh":"她需要钱。"},"C":{"en":"She is joking.","zh":"她在开玩笑。"},"D":{"en":"She needs help.","zh":"她需要帮助。"}},"type":"short","tip":"⑩她需要帮忙，⑪东西在湖底，⑫他喜欢「父亲」发在脸书的内容，⑬其实他连脸书都不会用。","key":"她需要帮助","tipType":"chain"},{"no":11,"answer":"A","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"It is at the bottom at the lake.","zh":"它在湖底。"},"B":{"en":"It is taken by the girl’s boyfriend.","zh":"它是被女孩的男朋友拿走的。"},"C":{"en":"It is sold by the girl.","zh":"它是被女孩卖掉的。"},"D":{"en":"The girl cannot find it anywhere.","zh":"女孩到处都找不到它。"}},"type":"detail","tip":"⑩她需要帮忙，⑪东西在湖底，⑫他喜欢「父亲」发在脸书的内容，⑬其实他连脸书都不会用。","key":"它在湖底","tipType":"chain"},{"no":12,"answer":"C","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"He and 20 of his friends will come to her father.","zh":"他和他的20个朋友会来找她的父亲。"},"B":{"en":"He was a member of a gang.","zh":"他曾是帮派成员。"},"C":{"en":"He loves the things he thought the father posted on his Facebook page.","zh":"他很喜欢他以为父亲发在脸书上的那些内容。"},"D":{"en":"He will get to the girl’s house in about 20 minutes.","zh":"他大约20分钟后会到女孩家。"}},"type":"detail","tip":"⑩她需要帮忙，⑪东西在湖底，⑫他喜欢「父亲」发在脸书的内容，⑬其实他连脸书都不会用。","key":"他很喜欢他以为父亲发在脸书上的那些内容","tipType":"chain"},{"no":13,"answer":"B","section":"B","group":"Conversation Two","range":[10,13],"options":{"A":{"en":"He doesn’t know Facebook at all.","zh":"他完全不知道脸书是什么。"},"B":{"en":"He doesn’t know how to use Facebook.","zh":"他不知道怎么用脸书。"},"C":{"en":"He uses Facebook every day.","zh":"他每天都用脸书。"},"D":{"en":"He posts something on the girl’s boyfriend’s Facebook page.","zh":"他在女孩男友的脸书主页上发了些东西。"}},"type":"detail","tip":"⑩她需要帮忙，⑪东西在湖底，⑫他喜欢「父亲」发在脸书的内容，⑬其实他连脸书都不会用。","key":"他不知道怎么用脸书","tipType":"chain"},{"no":14,"answer":"D","section":"C","group":"Passage One","range":[14,17],"options":{"A":{"en":"It will ring the alarm if we spend too much money.","zh":"如果我们花太多钱，它会发出警报。"},"B":{"en":"It will stop the payment if we spend money.","zh":"如果我们花钱，它会中止支付。"},"C":{"en":"It will give us an electric shock if we spend money.","zh":"如果我们花钱，它会给我们电击。"},"D":{"en":"It will give us an electric shock if we spend too much money.","zh":"如果我们花太多钱，它会给我们电击。"}},"type":"detail","tip":"⑭乱花钱它就电你，⑮255伏，⑯以后一切都联网，⑰人只买东西不看余额。","key":"如果我们花太多钱它会给我们电击","tipType":"chain"},{"no":15,"answer":"B","section":"C","group":"Passage One","range":[14,17],"options":{"A":{"en":"225 volt.","zh":"225 伏。"},"B":{"en":"255 volt.","zh":"255 伏。"},"C":{"en":"215 volt.","zh":"215 伏。"},"D":{"en":"525 volt.","zh":"525 伏。"}},"type":"number","tip":"⑭乱花钱它就电你，⑮255伏，⑯以后一切都联网，⑰人只买东西不看余额。","key":"255 伏","tipType":"chain"},{"no":16,"answer":"C","section":"C","group":"Passage One","range":[14,17],"options":{"A":{"en":"People’s willpower is too weak.","zh":"人们的意志力太薄弱。"},"B":{"en":"Everything in our life can be control by technology.","zh":"我们生活中的一切都能被技术控制。"},"C":{"en":"Everything in our life will be connected to the Internet.","zh":"我们生活中的一切都将连接到互联网。"},"D":{"en":"Science can improve willpower.","zh":"科学能够增强意志力。"}},"type":"detail","tip":"⑭乱花钱它就电你，⑮255伏，⑯以后一切都联网，⑰人只买东西不看余额。","key":"我们生活中的一切都将连接到互联网","tipType":"chain"},{"no":17,"answer":"B","section":"C","group":"Passage One","range":[14,17],"options":{"A":{"en":"People buy things after checking how much money they have in their bank.","zh":"人们在确认银行里有多少钱之后才买东西。"},"B":{"en":"People buy things rather than look at the balance they have in their bank.","zh":"人们只管买东西，而不看银行余额。"},"C":{"en":"People will run away when they have to pay for expensive things.","zh":"当需要为昂贵的东西付钱时，人们会逃开。"},"D":{"en":"People buy things rather than look at the price tag of the products.","zh":"人们只管买东西，而不看商品的价格标签。"}},"type":"detail","tip":"⑭乱花钱它就电你，⑮255伏，⑯以后一切都联网，⑰人只买东西不看余额。","key":"人们只管买东西而不看银行余额","tipType":"chain"},{"no":18,"answer":"C","section":"C","group":"Passage Two","range":[18,21],"options":{"A":{"en":"Rules of communication.","zh":"沟通的规则。"},"B":{"en":"Ways of making yourself understood.","zh":"让别人理解自己的方法。"},"C":{"en":"Suggestions to avoid misperception.","zh":"避免误解的建议。"},"D":{"en":"Models for decision-making.","zh":"决策模型。"}},"type":"short","tip":"⑱避免误解的建议，⑲关键在用词的选择，⑳把感受和判断分开，㉑4条。","key":"避免误解的建议","tipType":"chain"},{"no":19,"answer":"D","section":"C","group":"Passage Two","range":[18,21],"options":{"A":{"en":"Charisma.","zh":"个人魅力。"},"B":{"en":"Clarity.","zh":"清晰。"},"C":{"en":"Attitudes.","zh":"态度。"},"D":{"en":"Choice of words.","zh":"用词的选择。"}},"type":"short","tip":"⑱避免误解的建议，⑲关键在用词的选择，⑳把感受和判断分开，㉑4条。","key":"用词的选择","tipType":"chain"},{"no":20,"answer":"D","section":"C","group":"Passage Two","range":[18,21],"options":{"A":{"en":"Do not buy the car if you like the dealer.","zh":"如果你喜欢这位经销商，就不要买这辆车。"},"B":{"en":"Do not buy the car if you don’t like the dealer.","zh":"如果你不喜欢这位经销商，就不要买这辆车。"},"C":{"en":"Speaking about your intentions directly.","zh":"直接说出你的意图。"},"D":{"en":"Separate the feelings about the requester and the request.","zh":"把对请求者的感受与对请求本身的判断分开。"}},"type":"attitude","tip":"⑱避免误解的建议，⑲关键在用词的选择，⑳把感受和判断分开，㉑4条。","key":"把对请求者的感受与对请求本身的判断分开","tipType":"chain"},{"no":21,"answer":"B","section":"C","group":"Passage Two","range":[18,21],"options":{"A":{"en":"3.","zh":""},"B":{"en":"4.","zh":"4"},"C":{"en":"5.","zh":""},"D":{"en":"6.","zh":""}},"type":"number","tip":"⑱避免误解的建议，⑲关键在用词的选择，⑳把感受和判断分开，㉑4条。","key":"","tipType":"chain"},{"no":22,"answer":"C","section":"C","group":"Passage Three","range":[22,25],"options":{"A":{"en":"A simple way to treat overweight.","zh":"一种治疗超重的简单方法。"},"B":{"en":"A simple and easy way to help people to eat.","zh":"一种帮助人们进食的简单易行的方法。"},"C":{"en":"A new way to prevent people from over-eating.","zh":"一种防止人们吃得过多的新方法。"},"D":{"en":"A new way to lose weight.","zh":"一种减肥的新方法。"}},"type":"detail","tip":"㉒防止吃太多的新方法，㉓换小餐具，㉔饭量降29%，㉕说到底是缺乏自控。","key":"一种防止人们吃得过多的新方法","tipType":"chain"},{"no":23,"answer":"B","section":"C","group":"Passage Three","range":[22,25],"options":{"A":{"en":"Using larger tableware.","zh":"使用更大的餐具。"},"B":{"en":"Using smaller tableware.","zh":"使用更小的餐具。"},"C":{"en":"Cooking less.","zh":"少做一点饭。"},"D":{"en":"Cooking more.","zh":"多做一点饭。"}},"type":"short","tip":"㉒防止吃太多的新方法，㉓换小餐具，㉔饭量降29%，㉕说到底是缺乏自控。","key":"使用更小的餐具","tipType":"chain"},{"no":24,"answer":"B","section":"C","group":"Passage Three","range":[22,25],"options":{"A":{"en":"16%.","zh":"百分之 16"},"B":{"en":"29%.","zh":"百分之 29"},"C":{"en":"60%.","zh":"百分之 60"},"D":{"en":"100%.","zh":"百分之 100"}},"type":"number","tip":"㉒防止吃太多的新方法，㉓换小餐具，㉔饭量降29%，㉕说到底是缺乏自控。","key":"百分之 29","tipType":"chain"},{"no":25,"answer":"A","section":"C","group":"Passage Three","range":[22,25],"options":{"A":{"en":"A lack of self-control.","zh":"缺乏自我控制。"},"B":{"en":"A sign of good appetite.","zh":"胃口好的表现。"},"C":{"en":"A lack of food.","zh":"食物不足。"},"D":{"en":"A sign of good health.","zh":"健康的表现。"}},"type":"detail","tip":"㉒防止吃太多的新方法，㉓换小餐具，㉔饭量降29%，㉕说到底是缺乏自控。","key":"缺乏自我控制","tipType":"chain"}]},{"id":7,"title":"第7套","topic":"节日","questions":[{"no":1,"answer":"D","options":{"A":{"en":"New Year's resolutions.","zh":"新年的决心"},"B":{"en":"Reflections on the past year.","zh":"对过去一年的回顾"},"C":{"en":"Festive atmosphere of the new year in town.","zh":"城里新年的节日气氛"},"D":{"en":"How to celebrate the upcoming new year.","zh":"如何庆祝即将到来的新年"}},"tip":"①商量怎么庆祝新年，②她去城里的大型户外活动，③他的决心是关注健康，④最后举杯喝香槟。","section":"A","group":"Conversation One","range":[1,4],"tipType":"chain"},{"no":2,"answer":"B","options":{"A":{"en":"Having a cozy dinner at home.","zh":"在家吃顿温馨的晚餐"},"B":{"en":"Going to a big outdoor event in the city.","zh":"去城里的大型户外活动"},"C":{"en":"Watching the countdown on TV.","zh":"在电视上看倒计时"},"D":{"en":"Reflecting on the past year.","zh":"回顾过去一年"}},"tip":"①商量怎么庆祝新年，②她去城里的大型户外活动，③他的决心是关注健康，④最后举杯喝香槟。","section":"A","group":"Conversation One","range":[1,4],"tipType":"chain"},{"no":3,"answer":"A","options":{"A":{"en":"Focusing on health.","zh":"关注健康"},"B":{"en":"Learning a new skill or hobby.","zh":"学一门新技能或爱好"},"C":{"en":"Making personal growth a priority.","zh":"把个人成长放在首位"},"D":{"en":"Enjoying live music and fireworks.","zh":"享受现场音乐和烟花"}},"tip":"①商量怎么庆祝新年，②她去城里的大型户外活动，③他的决心是关注健康，④最后举杯喝香槟。","section":"A","group":"Conversation One","range":[1,4],"tipType":"chain"},{"no":4,"answer":"A","options":{"A":{"en":"By drinking champagne.","zh":"喝香槟"},"B":{"en":"By hugging and wishing each other well.","zh":"拥抱并互致祝福"},"C":{"en":"By reflecting on the past year.","zh":"回顾过去一年"},"D":{"en":"By gathering around midnight.","zh":"午夜时分聚在一起"}},"tip":"①商量怎么庆祝新年，②她去城里的大型户外活动，③他的决心是关注健康，④最后举杯喝香槟。","section":"A","group":"Conversation One","range":[1,4],"tipType":"chain"},{"no":5,"answer":"C","options":{"A":{"en":"The story of Chang'e.","zh":"嫦娥的故事"},"B":{"en":"The tradition of eating mooncakes.","zh":"吃月饼的传统"},"C":{"en":"The origin and customs of the Mid-Autumn Festival.","zh":"中秋节的起源与习俗"},"D":{"en":"The traditional celebrating events of the Mid-Autumn Festival.","zh":"中秋节的传统庆祝活动"}},"tip":"⑤中秋的起源与习俗，⑥古人拜的是月亮，⑦讲的是团圆与亲情，⑧最后提到对神灵的崇拜。","section":"B","group":"Passage One","range":[5,8],"tipType":"chain"},{"no":6,"answer":"B","options":{"A":{"en":"The worship of Chang'e.","zh":"对嫦娥的崇拜"},"B":{"en":"The worship of the moon.","zh":"对月亮的崇拜"},"C":{"en":"The worship of the jade rabbit.","zh":"对玉兔的崇拜"},"D":{"en":"The worship of the moon goddess.","zh":"对月神的崇拜"}},"tip":"⑤中秋的起源与习俗，⑥古人拜的是月亮，⑦讲的是团圆与亲情，⑧最后提到对神灵的崇拜。","section":"B","group":"Passage One","range":[5,8],"tipType":"chain"},{"no":7,"answer":"A","options":{"A":{"en":"Reunion and affection.","zh":"团圆与亲情"},"B":{"en":"Togetherness and friendship.","zh":"相聚与友谊"},"C":{"en":"Reunion and friendship.","zh":"团圆与友谊"},"D":{"en":"Tradition and affection.","zh":"传统与亲情"}},"tip":"⑤中秋的起源与习俗，⑥古人拜的是月亮，⑦讲的是团圆与亲情，⑧最后提到对神灵的崇拜。","section":"B","group":"Passage One","range":[5,8],"tipType":"chain"},{"no":8,"answer":"C","options":{"A":{"en":"Expressions of gratitude.","zh":"表达感恩"},"B":{"en":"Family reunions.","zh":"家庭团聚"},"C":{"en":"Worship of gods and goddesses.","zh":"对神灵的崇拜"},"D":{"en":"The appreciation of nature's beauty.","zh":"对自然之美的欣赏"}},"tip":"⑤中秋的起源与习俗，⑥古人拜的是月亮，⑦讲的是团圆与亲情，⑧最后提到对神灵的崇拜。","section":"B","group":"Passage One","range":[5,8],"tipType":"chain"}]},{"id":8,"title":"第8套","topic":"饮食","questions":[{"no":1,"answer":"C","options":{"A":{"en":"Korean foods.","zh":"韩国食物"},"B":{"en":"Korean restaurants.","zh":"韩国餐馆"},"C":{"en":"Eating out.","zh":"外出就餐"},"D":{"en":"Fried chickens.","zh":"炸鸡"}},"tip":"①两人在聊外出就餐，②那家店做传统韩国街头小吃，③可官网查不到价格，④最后珍妮买单。","section":"A","group":"Conversation One","range":[1,4],"tipType":"chain"},{"no":2,"answer":"D","options":{"A":{"en":"It serves Korean food.","zh":"它供应韩国菜"},"B":{"en":"It is named after its chef.","zh":"它以厨师的名字命名"},"C":{"en":"She knows the owner of Jinjuu.","zh":"她认识 Jinjuu 的老板"},"D":{"en":"It serves traditional Korean street food.","zh":"它供应传统韩国街头小吃"}},"tip":"①两人在聊外出就餐，②那家店做传统韩国街头小吃，③可官网查不到价格，④最后珍妮买单。","section":"A","group":"Conversation One","range":[1,4],"tipType":"chain"},{"no":3,"answer":"C","options":{"A":{"en":"It is quite expensive to eat there.","zh":"在那儿吃饭相当贵"},"B":{"en":"The price is quite reasonable in the restaurant.","zh":"这家餐厅价格相当合理"},"C":{"en":"The pricing information is not found on its website.","zh":"官网上找不到价格信息"},"D":{"en":"Jenny can't afford to eat there.","zh":"珍妮吃不起那儿"}},"tip":"①两人在聊外出就餐，②那家店做传统韩国街头小吃，③可官网查不到价格，④最后珍妮买单。","section":"A","group":"Conversation One","range":[1,4],"tipType":"chain"},{"no":4,"answer":"B","options":{"A":{"en":"Ted.","zh":"泰德"},"B":{"en":"Jenny.","zh":"珍妮"},"C":{"en":"Jane.","zh":"简"},"D":{"en":"They will split the bill.","zh":"他们会各付各的"}},"tip":"①两人在聊外出就餐，②那家店做传统韩国街头小吃，③可官网查不到价格，④最后珍妮买单。","section":"A","group":"Conversation One","range":[1,4],"tipType":"chain"},{"no":5,"answer":"B","options":{"A":{"en":"Different flavors of Chinese food in different regions.","zh":"不同地区中餐的不同风味"},"B":{"en":"Regional diversity, balance and visual appeal of Chinese food.","zh":"中餐的地域多样性、平衡与视觉美感"},"C":{"en":"The importance of balance and harmony in Chinese food.","zh":"中餐里平衡与和谐的重要性"},"D":{"en":"The importance of visual aesthetics in Chinese food.","zh":"中餐视觉美学的重要性"}},"tip":"⑤中餐的地域多样性与视觉美感，⑥靠大火快炒，⑦最后落在营养上。","section":"B","group":"Passage One","range":[5,7],"tipType":"chain"},{"no":6,"answer":"D","options":{"A":{"en":"It is unique for Chinese cooking.","zh":"它是中式烹饪独有的"},"B":{"en":"It is an excellent tool for the spicy food of Sichuan.","zh":"它是做川菜辣味的好工具"},"C":{"en":"Rice and noodles are staple ingredients for it.","zh":"米饭和面条是它的主要食材"},"D":{"en":"Foods are cooked quickly over high heat in it.","zh":"食物在里面用大火快炒"}},"tip":"⑤中餐的地域多样性与视觉美感，⑥靠大火快炒，⑦最后落在营养上。","section":"B","group":"Passage One","range":[5,7],"tipType":"chain"},{"no":7,"answer":"C","options":{"A":{"en":"Flavors.","zh":"风味"},"B":{"en":"Colors.","zh":"色彩"},"C":{"en":"Nutrition.","zh":"营养"},"D":{"en":"Textures.","zh":"口感"}},"tip":"⑤中餐的地域多样性与视觉美感，⑥靠大火快炒，⑦最后落在营养上。","section":"B","group":"Passage One","range":[5,7],"tipType":"chain"}]},{"id":9,"title":"第9套","topic":"教育","questions":[{"no":1,"answer":"A","options":{"A":{"en":"Freshman.","zh":"大一新生"},"B":{"en":"Sophomore.","zh":"大二学生"},"C":{"en":"Junior.","zh":"大三学生"},"D":{"en":"Senior.","zh":"大四学生"}},"tip":"①他是大一新生，②课后去参加社团活动，③每两周一次，④在市中心观光。","section":"A","group":"Conversation One","range":[1,4],"tipType":"chain"},{"no":2,"answer":"A","options":{"A":{"en":"He joins in club activities.","zh":"他参加社团活动"},"B":{"en":"He has classes.","zh":"他有课"},"C":{"en":"He goes to the library.","zh":"他去图书馆"},"D":{"en":"He meets his teacher.","zh":"他去见老师"}},"tip":"①他是大一新生，②课后去参加社团活动，③每两周一次，④在市中心观光。","section":"A","group":"Conversation One","range":[1,4],"tipType":"chain"},{"no":3,"answer":"C","options":{"A":{"en":"Once a week.","zh":"每周一次"},"B":{"en":"Once a day.","zh":"每天一次"},"C":{"en":"Every other week.","zh":"每两周一次"},"D":{"en":"Twice a day.","zh":"每天两次"}},"tip":"①他是大一新生，②课后去参加社团活动，③每两周一次，④在市中心观光。","section":"A","group":"Conversation One","range":[1,4],"tipType":"chain"},{"no":4,"answer":"C","options":{"A":{"en":"Attending lectures.","zh":"听课"},"B":{"en":"Running on the playground.","zh":"在操场跑步"},"C":{"en":"Sightseeing in the city center.","zh":"在市中心观光"},"D":{"en":"Doing presentations in different classes.","zh":"在不同班级做展示"}},"tip":"①他是大一新生，②课后去参加社团活动，③每两周一次，④在市中心观光。","section":"A","group":"Conversation One","range":[1,4],"tipType":"chain"},{"no":5,"answer":"A","options":{"A":{"en":"Education.","zh":"教育"},"B":{"en":"Employment.","zh":"就业"},"C":{"en":"Poverty reduction.","zh":"减贫"},"D":{"en":"Human rights.","zh":"人权"}},"tip":"⑤讲的是教育，⑥97%，⑦2,756，⑧1,486。","section":"B","group":"Passage One","range":[5,8],"tipType":"chain"},{"no":6,"answer":"B","options":{"A":{"en":"79%.","zh":"79%"},"B":{"en":"97%.","zh":"97%"},"C":{"en":"82%.","zh":"82%"},"D":{"en":"41%.","zh":"41%"}},"tip":"⑤讲的是教育，⑥97%，⑦2,756，⑧1,486。","section":"B","group":"Passage One","range":[5,8],"tipType":"chain"},{"no":7,"answer":"B","options":{"A":{"en":"1,486.","zh":"1,486"},"B":{"en":"2,756.","zh":"2,756"},"C":{"en":"1,270.","zh":"1,270"},"D":{"en":"1,217.","zh":"1,217"}},"tip":"⑤讲的是教育，⑥97%，⑦2,756，⑧1,486。","section":"B","group":"Passage One","range":[5,8],"tipType":"chain"},{"no":8,"answer":"A","options":{"A":{"en":"1,486.","zh":"1,486"},"B":{"en":"2,756.","zh":"2,756"},"C":{"en":"1,270.","zh":"1,270"},"D":{"en":"1,217.","zh":"1,217"}},"tip":"⑤讲的是教育，⑥97%，⑦2,756，⑧1,486。","section":"B","group":"Passage One","range":[5,8],"tipType":"chain"}]},{"id":10,"title":"第10套","topic":"水资源","questions":[{"no":1,"answer":"B","options":{"A":{"en":"At a shop.","zh":"在商店"},"B":{"en":"At a travel agency.","zh":"在旅行社"},"C":{"en":"At a hotel.","zh":"在酒店"},"D":{"en":"At a station.","zh":"在车站"}},"tip":"①在旅行社，②她来自非洲，③三年前，④两人在计划去长江的旅行。","section":"A","group":"Conversation One","range":[1,4],"tipType":"chain"},{"no":2,"answer":"C","options":{"A":{"en":"Asia.","zh":"亚洲"},"B":{"en":"America.","zh":"美洲"},"C":{"en":"Africa.","zh":"非洲"},"D":{"en":"Europe.","zh":"欧洲"}},"tip":"①在旅行社，②她来自非洲，③三年前，④两人在计划去长江的旅行。","section":"A","group":"Conversation One","range":[1,4],"tipType":"chain"},{"no":3,"answer":"C","options":{"A":{"en":"One year ago.","zh":"一年前"},"B":{"en":"Two years ago.","zh":"两年前"},"C":{"en":"Three years ago.","zh":"三年前"},"D":{"en":"Four years ago.","zh":"四年前"}},"tip":"①在旅行社，②她来自非洲，③三年前，④两人在计划去长江的旅行。","section":"A","group":"Conversation One","range":[1,4],"tipType":"chain"},{"no":4,"answer":"B","options":{"A":{"en":"Discussing the importance of the Yangtze River.","zh":"讨论长江的重要性"},"B":{"en":"Planning a trip to visit the Yangtze River.","zh":"计划去长江旅游"},"C":{"en":"Comparing the Yangtze River with other rivers.","zh":"把长江与其他河流作比较"},"D":{"en":"Sharing personal travel experiences.","zh":"分享个人旅行经历"}},"tip":"①在旅行社，②她来自非洲，③三年前，④两人在计划去长江的旅行。","section":"A","group":"Conversation One","range":[1,4],"tipType":"chain"},{"no":5,"answer":"A","options":{"A":{"en":"Water pollution.","zh":"水污染"},"B":{"en":"Water protection.","zh":"水资源保护"},"C":{"en":"Water irrigation.","zh":"水利灌溉"},"D":{"en":"Water supply.","zh":"供水"}},"tip":"⑤水污染，⑥工业发展是绕不开的因素，⑦湖泊，⑧作者态度是积极的。","section":"B","group":"Passage One","range":[5,8],"tipType":"chain"},{"no":6,"answer":"D","options":{"A":{"en":"The development of the world.","zh":"世界的发展"},"B":{"en":"The development of the Earth.","zh":"地球的演化"},"C":{"en":"The development of agriculture.","zh":"农业的发展"},"D":{"en":"The development of industry.","zh":"工业的发展"}},"tip":"⑤水污染，⑥工业发展是绕不开的因素，⑦湖泊，⑧作者态度是积极的。","section":"B","group":"Passage One","range":[5,8],"tipType":"chain"},{"no":7,"answer":"D","options":{"A":{"en":"Rivers.","zh":"河流"},"B":{"en":"Seas.","zh":"海洋"},"C":{"en":"Oceans.","zh":"大洋"},"D":{"en":"Lakes.","zh":"湖泊"}},"tip":"⑤水污染，⑥工业发展是绕不开的因素，⑦湖泊，⑧作者态度是积极的。","section":"B","group":"Passage One","range":[5,8],"tipType":"chain"},{"no":8,"answer":"B","options":{"A":{"en":"Negative.","zh":"否定的；消极的"},"B":{"en":"Positive.","zh":"积极的；正面的"},"C":{"en":"Doubtful.","zh":"怀疑的"},"D":{"en":"Hesitant.","zh":"犹豫的"}},"tip":"⑤水污染，⑥工业发展是绕不开的因素，⑦湖泊，⑧作者态度是积极的。","section":"B","group":"Passage One","range":[5,8],"tipType":"chain"}]},{"id":11,"title":"第11套","topic":"城市生活","questions":[{"no":1,"answer":"C","options":{"A":{"en":"Living expenses in London.","zh":"伦敦的生活开支"},"B":{"en":"Traffic jams in London.","zh":"伦敦的交通拥堵"},"C":{"en":"Living in big cities.","zh":"在大城市生活"},"D":{"en":"Pollution in London.","zh":"伦敦的污染"}},"section":"A","group":"Conversation One","range":[1,4],"tip":"①聊的是在大城市生活，②房东要涨房租，③劝他少下馆子少点外卖，④图的还是工作机会多。","tipType":"chain"},{"no":2,"answer":"B","options":{"A":{"en":"Jane wanted the landlord to reduce the rent.","zh":"简希望房东降房租"},"B":{"en":"The landlord wanted to increase the rent.","zh":"房东想涨房租"},"C":{"en":"The landlord wanted Jane to move.","zh":"房东想让简搬走"},"D":{"en":"Jane wanted to move.","zh":"简想搬家"}},"section":"A","group":"Conversation One","range":[1,4],"tip":"①聊的是在大城市生活，②房东要涨房租，③劝他少下馆子少点外卖，④图的还是工作机会多。","tipType":"chain"},{"no":3,"answer":"C","options":{"A":{"en":"He should take the tube instead of riding a bicycle.","zh":"他该坐地铁，别骑自行车"},"B":{"en":"He should find an apartment near Hyde Park Corner.","zh":"他该在海德公园角附近找房子"},"C":{"en":"He should cut the expenses on dining out and takeaways.","zh":"他该削减下馆子和点外卖的开销"},"D":{"en":"He should find a high-paying job.","zh":"他该找份高薪工作"}},"section":"A","group":"Conversation One","range":[1,4],"tip":"①聊的是在大城市生活，②房东要涨房租，③劝他少下馆子少点外卖，④图的还是工作机会多。","tipType":"chain"},{"no":4,"answer":"D","options":{"A":{"en":"It is cheaper to live in a big city.","zh":"在大城市生活更便宜"},"B":{"en":"There are fewer environmental problems.","zh":"环境问题更少"},"C":{"en":"The traffic is less heavy.","zh":"交通没那么拥堵"},"D":{"en":"There are more job opportunities.","zh":"工作机会更多"}},"section":"A","group":"Conversation One","range":[1,4],"tip":"①聊的是在大城市生活，②房东要涨房租，③劝他少下馆子少点外卖，④图的还是工作机会多。","tipType":"chain"},{"no":5,"answer":"B","options":{"A":{"en":"A brief introduction to Qin Shi Huang.","zh":"秦始皇简介"},"B":{"en":"A brief introduction to Xi'an.","zh":"西安简介"},"C":{"en":"The story of terracotta troops.","zh":"兵马俑的故事"},"D":{"en":"The religions in Xi'an.","zh":"西安的宗教"}},"section":"B","group":"Passage One","range":[5,7],"tip":"⑤通篇是西安简介，⑥兵马俑近 9,000，⑦当年是全球人口最多的城市。","tipType":"chain"},{"no":6,"answer":"B","options":{"A":{"en":"About 2,200.","zh":"约 2,200"},"B":{"en":"Almost 9,000.","zh":"近 9,000"},"C":{"en":"Around 700,000.","zh":"约 700,000"},"D":{"en":"About 10,000.","zh":"约 10,000"}},"section":"B","group":"Passage One","range":[5,7],"tip":"⑤通篇是西安简介，⑥兵马俑近 9,000，⑦当年是全球人口最多的城市。","tipType":"chain"},{"no":7,"answer":"C","options":{"A":{"en":"It became the religious center of Islam.","zh":"它成了伊斯兰教的宗教中心"},"B":{"en":"It was linked to West and Central Asia.","zh":"它与西亚、中亚相连"},"C":{"en":"It became the most populous city in the world.","zh":"它成了世界上人口最多的城市"},"D":{"en":"It had the largest mosque in the world.","zh":"它有世界上最大的清真寺"}},"section":"B","group":"Passage One","range":[5,7],"tip":"⑤通篇是西安简介，⑥兵马俑近 9,000，⑦当年是全球人口最多的城市。","tipType":"chain"}]}]</script>
+<script>
+(function(){
+"use strict";
+
+/* =========================================================
+   数据层
+   ========================================================= */
+var BANK = JSON.parse(document.getElementById('bank-data').textContent);
+var LS_PROG = 'listen_drill_v1';        // 进度存档（与旧版共用）
+var LS_PREF = 'listen_drill_prefs';     // 偏好设置
+
+var SEC_LABEL = {A:'Section A · 短对话', B:'Section B · 长对话', C:'Section C · 短文听力'};
+var SEC_SHORT = {A:'短对话', B:'长对话', C:'短文听力'};
+var SEC_TIP = {
+  A:'短对话只听一句：答案多半在第二个说话人嘴里，注意 but / so / actually 后面的转折。',
+  B:'长对话先扫四个选项猜场景，听到与选项同义的表达就锁定，不必逐句听懂。',
+  C:'短文听力按题号顺序定位，先划选项里的关键词，别等全文听完再回忆。'
+};
+/* 分类看内容不看字母：这几套教材的 Section A 本身就是长对话 */
+function qCat(q){
+  if(!q.group) return 'A';
+  return /Conversation/i.test(q.group) ? 'B' : 'C';
+}
+function qLabel(q){
+  return 'Section ' + q.section + ' · ' + SEC_SHORT[qCat(q)];
+}
+var TICK = '<svg class="tick" viewBox="0 0 24 24" fill="none" stroke="#2F7A55" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+
+/* 全局索引：uid -> 题目，避免线性查找 */
+var ALL = [], MAP = {};
+BANK.forEach(function(set){
+  set.questions.forEach(function(q, i){
+    q.setId = set.id; q.setTitle = set.title; q.pos = i;
+    q.uid = set.id + '-' + q.no;
+    MAP[q.uid] = q;
+    ALL.push(q);
+  });
+  var gcount = {}, seen = {};
+  set.questions.forEach(function(q){ if(q.group){ gcount[q.group] = (gcount[q.group]||0) + 1; } });
+  set.questions.forEach(function(q){
+    if(q.group){ seen[q.group] = (seen[q.group]||0) + 1; q.gidx = seen[q.group]; q.gtotal = gcount[q.group]; }
+  });
+  set.blocks = buildBlocks(set.questions.map(function(q){ return q.uid; }));
+});
+
+/* 把一串 uid 切成「答题单元」：同套同篇章的连续题目合成一个连做单元 */
+function buildBlocks(uids){
+  var out = [], cur = null;
+  uids.forEach(function(uid){
+    var q = MAP[uid];
+    if(!q) return;
+    if(q.group){
+      /* 同一套 + 同一篇章名 = 同一段（range 是数组，不能拿来比引用） */
+      if(cur && cur.group === q.group && cur.setId === q.setId){
+        cur.uids.push(uid);
+      } else {
+        cur = {setId:q.setId, group:q.group, range:q.range, section:q.section, uids:[uid]};
+        out.push(cur);
+      }
+    } else {
+      cur = null;
+      out.push({setId:q.setId, group:null, range:null, section:q.section, uids:[uid]});
+    }
+  });
+  return out;
+}
+
+function blocksOfSection(cat){
+  var out = [];
+  BANK.forEach(function(set){
+    set.blocks.forEach(function(b){
+      if(qCat(MAP[b.uids[0]]) === cat) out.push(b);
+    });
+  });
+  return out;
+}
+function questionsIn(blocks){
+  var n = 0;
+  blocks.forEach(function(b){ n += b.uids.length; });
+  return n;
+}
+
+/* =========================================================
+   课文填空（独立板块，与听力题库同壳不同题）
+   ========================================================= */
+var CLOZE = {
+  title:'Happy Birthday to You',
+  sub:'希尔家族与生日歌版权',
+  rows:[
+    {time:'In {{t1}}.', event:'Mildred and Patty Hill, two American {{a1}}, composed the song “Good Morning to All” to greet their {{a2}} every morning.'},
+    {time:'Later', event:'The {{b1}} of the song was known as “{{b2}} Morning to You” when it was used for {{b3}} to sing to their {{b4}}.'},
+    {time:'In {{t2}}', event:'The song appeared in a(n) {{c1}} edited by Robert Coleman. And a second verse “Happy Birthday to You” was {{c2}} to it. It is unclear who {{c3}} the lyrics to the second verse.'},
+    {time:'By mid-{{t3}}.', event:'The song {{d1}} repeatedly in {{d2}}, radio shows, and Broadway musicals without the {{d4}} of the Hill family.'},
+    {time:'In 1934', event:'Jessica Hill decided to act {{e1}} her elder sisters and filed a suit. She {{e2}} in court that “Happy Birthday to You” was actually their song with {{e3}}.'},
+    {time:'From then on', event:'Every time the song is sung {{f1}}, the Hill family {{f2}}.'}
+  ],
+  blanks:{
+    t1:{a:['1893'], h:'年份 · 1893'},
+    a1:{a:['teachers','teacher','kindergarten teachers','kindergarten teacher'], h:'老师（填 teachers 即可）'},
+    a2:{a:['students','student'], h:'学生们（复数）'},
+    b1:{a:['title'], h:'标题'},
+    b2:{a:['Good'], h:'只填 Good（后面 Morning to You 书上已给出）'},
+    b3:{a:['children','child'], h:'孩子们'},
+    b4:{a:['teacher','teachers'], h:'老师'},
+    t2:{a:['1924'], h:'年份 · 1924'},
+    c1:{a:['book','book of music','music book','songbook'], h:'书 / 曲谱本'},
+    c2:{a:['added'], h:'被加上（被动）'},
+    c3:{a:['supplied'], h:'提供（过去式）'},
+    t3:{a:['1930s','the 1930s','1930'], h:'20 世纪 30 年代中期'},
+    d1:{a:['was used','used','was sung'], h:'被使用 / 被演唱（被动）'},
+    d2:{a:['movies','movie','films','film'], h:'电影'},
+    d4:{a:['permission'], h:'许可 · 允许'},
+    e1:{a:['on behalf of'], h:'代表……'},
+    e2:{a:['proved','proven'], h:'证明（过去式）'},
+    e3:{a:['different lyrics'], h:'两个词一起填：different lyrics'},
+    f1:{a:['publicly','in public'], h:'公开地'},
+    f2:{a:['gets paid','get paid','was paid','is paid','got paid'], h:'得到报酬'}
+  }
+};
+var CLOZE_IDS = Object.keys(CLOZE.blanks);
+function cNorm(s){
+  return String(s || '').toLowerCase()
+    .replace(/[’‘`´]/g, "'").replace(/[“”]/g, '"')
+    .replace(/[.,!?;:"'’‘()\[\]{}]/g, '').replace(/\s+/g, ' ').trim();
+}
+function cOK(v, id){ var b = CLOZE.blanks[id]; return !!b && b.a.some(function(x){ return cNorm(x) === v; }); }
+function cPre(v, id){ var b = CLOZE.blanks[id]; return !!b && b.a.some(function(x){ return cNorm(x).indexOf(v) === 0; }); }
+/* 空的状态由输入值直接推出来，不存冗余标记 */
+function cState(id){
+  var v = cNorm(S.clozeVal[id] || '');
+  if(!v) return '';
+  if(cOK(v, id)) return 'ok';
+  if(cPre(v, id)) return '';
+  return 'bad';
+}
+function clozeRight(){
+  var n = 0;
+  CLOZE_IDS.forEach(function(id){ if(cOK(cNorm(S.clozeVal[id] || ''), id)) n++; });
+  return n;
+}
+
+/* =========================================================
+   工具
+   ========================================================= */
+/* 全量转义：文本节点与属性值都安全 */
+function esc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/* =========================================================
+   存储（带类型校验，防脏数据）
+   ========================================================= */
+function num(v){ var n = Number(v); return isFinite(n) && n > 0 ? n : 0; }
+
+function loadProg(){
+  try{
+    var raw = JSON.parse(localStorage.getItem(LS_PROG)) || {};
+    var out = {};
+    Object.keys(raw).forEach(function(k){
+      var o = raw[k] || {};
+      out[k] = {best:num(o.best), times:num(o.times), total:num(o.total), ts:num(o.ts)};
+    });
+    return out;
+  }catch(e){ return {}; }
+}
+function saveProg(o){ try{ localStorage.setItem(LS_PROG, JSON.stringify(o)); }catch(e){} }
+
+function loadPref(){
+  try{
+    var o = JSON.parse(localStorage.getItem(LS_PREF)) || {};
+    return {shuffle: !!o.shuffle};
+  }catch(e){ return {shuffle:false}; }
+}
+function savePref(o){ try{ localStorage.setItem(LS_PREF, JSON.stringify(o)); }catch(e){} }
+
+var STORE = loadProg();
+var PREF = loadPref();
+
+function progOf(id){
+  var p = STORE['set' + id];
+  if(!p) return {best:0, total:0, times:0};
+  return p;
+}
+
+/* =========================================================
+   状态
+   ========================================================= */
+var S = {
+  view:'home',      // home | quiz | result
+  blocks:[],        // 本次会话的答题单元
+  bi:0,             // 当前单元下标
+  answers:{},       // uid -> {key:'C', letter:'B'}  key=原始选项键，letter=界面显示字母
+  submitted:{},     // bi -> true（连做单元提交后锁定）
+  orders:{},        // uid -> ['B','A','D','C'] 显示顺序（原始键）
+  mode:'seq',       // seq | rnd
+  cat:'',           // A | B | C | all | wrong
+  setId:0,
+  title:'',
+  focus:'',         // 连做单元里键盘操作的焦点题
+  anim:true,        // 是否播放入场动画（只在换单元时为 true）
+  clozeVal:{},      // 课文填空：id -> 原始输入
+  clozeShown:false, // 是否已显示答案
+  clozeDone:false   // 本次是否已记账
+};
+
+function go(v){ S.view = v; render(); }
+
+/* =========================================================
+   选项顺序（乱序模式）
+   ========================================================= */
+function rnd(n){
+  try{
+    if(window.crypto && window.crypto.getRandomValues){
+      var b = new Uint32Array(1);
+      window.crypto.getRandomValues(b);
+      return b[0] % n;
+    }
+  }catch(e){}
+  return Math.floor(Math.random() * n);
+}
+function shuffled(arr){
+  for(var i = arr.length - 1; i > 0; i--){
+    var j = rnd(i + 1), t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+  }
+  return arr;
+}
+/* 返回该题四个选项的显示顺序（原始键数组），一次会话内固定 */
+function orderOf(q){
+  var o = S.orders[q.uid];
+  if(!o){
+    o = ['A','B','C','D'];
+    if(S.shuffle) shuffled(o);
+    S.orders[q.uid] = o;
+  }
+  return o;
+}
+/* 正确答案在界面上的字母 */
+function ansLetterOf(q){
+  return 'ABCD'[orderOf(q).indexOf(q.answer)];
+}
+/* 界面字母 -> 原始选项键 */
+function keyOfLetter(q, letter){
+  return orderOf(q)['ABCD'.indexOf(letter)];
+}
+/* 新文案里不再出现选项字母，乱序时无需改写；保留函数便于日后扩展 */
+function tipOf(q){ return q.tip || ''; }
+/* 妙招标签：整段串记 vs 单题钩子 */
+function tipLabel(q){ return q.group ? '串记' : '记忆钩子'; }
+/* 串记里的 ⑥⑦⑧ 加重，扫一眼就能对上题号 */
+function tipHTML(q){
+  return esc(tipOf(q)).replace(/[\u2460-\u2473]/g, function(m){ return '<em>' + m + '</em>'; });
+}
+
+/* =========================================================
+   会话控制
+   ========================================================= */
+function begin(blocks, opt){
+  if(!blocks || !blocks.length){ go('home'); return; }
+  S.blocks = blocks;
+  S.bi = 0;
+  S.answers = {};
+  S.submitted = {};
+  S.orders = {};
+  S.focus = '';
+  S.anim = true;
+  S.mode = opt.mode;
+  S.cat = opt.cat || '';
+  S.setId = opt.setId || 0;
+  S.title = opt.title;
+  setFocus();
+  go('quiz');
+}
+function startSet(id){
+  var set = null;
+  BANK.forEach(function(s){ if(s.id === id) set = s; });
+  if(!set) return;
+  begin(set.blocks.slice(), {mode:'seq', setId:id, title:set.title});
+}
+function startRandom(cat){
+  var src;
+  if(cat === 'all'){
+    src = [];
+    BANK.forEach(function(s){ src = src.concat(s.blocks); });
+  } else {
+    src = blocksOfSection(cat);
+  }
+  src = shuffled(src.slice());
+  begin(src, {
+    mode:'rnd',
+    cat:cat,
+    title: cat === 'all' ? '随机练习' : ('随机 · ' + SEC_SHORT[cat])
+  });
+}
+
+function setFocus(){
+  S.focus = '';
+  var b = S.blocks[S.bi];
+  if(!b || b.uids.length < 2) return;
+  for(var i = 0; i < b.uids.length; i++){
+    if(!S.answers[b.uids[i]]){ S.focus = b.uids[i]; return; }
+  }
+}
+function totalQuestions(){
+  var n = 0;
+  S.blocks.forEach(function(b){ n += b.uids.length; });
+  return n;
+}
+function answeredCount(){
+  var n = 0;
+  S.blocks.forEach(function(b){
+    b.uids.forEach(function(u){ if(S.answers[u]) n++; });
+  });
+  return n;
+}
+function allAnswered(b){
+  for(var i = 0; i < b.uids.length; i++){ if(!S.answers[b.uids[i]]) return false; }
+  return true;
+}
+function isRight(uid){
+  var a = S.answers[uid];
+  return !!(a && a.key === MAP[uid].answer);
+}
+function countRight(){
+  var n = 0;
+  S.blocks.forEach(function(b){
+    b.uids.forEach(function(u){ if(isRight(u)) n++; });
+  });
+  return n;
+}
+
+function persist(right, total){
+  var key = S.mode === 'seq' ? ('set' + S.setId) : ('rnd_' + (S.cat || 'all'));
+  var old = STORE[key] || {};
+  STORE[key] = {
+    best: Math.max(num(old.best), right),
+    times: num(old.times) + 1,
+    total: total,
+    ts: Date.now()
+  };
+  saveProg(STORE);
+}
+
+function advance(){
+  if(S.bi + 1 >= S.blocks.length){ finish(); return; }
+  S.bi++;
+  S.focus = '';
+  S.anim = true;
+  setFocus();
+  render();
+}
+function prevBlock(){
+  if(S.bi <= 0) return;
+  S.bi--;
+  S.focus = '';
+  S.anim = true;
+  setFocus();
+  render();
+}
+function submitBlock(){
+  var b = S.blocks[S.bi];
+  if(!b || !allAnswered(b)) return;
+  S.submitted[S.bi] = true;
+  S.focus = '';
+  S.anim = false;
+  render();
+}
+function finish(){
+  var total = totalQuestions();
+  persist(countRight(), total);
+  S.view = 'result';
+  render();
+}
+
+/* =========================================================
+   首页
+   ========================================================= */
+function viewHome(){
+  var totalQ = ALL.length;
+  var learned = 0;
+  BANK.forEach(function(s){ learned += num(progOf(s.id).best); });
+
+  var cards = BANK.map(function(s){
+    var p = progOf(s.id);
+    var t = s.questions.length;
+    var pct = t ? Math.round(num(p.best) / t * 100) : 0;
+    var r = 34, c = 2 * Math.PI * (r/2 - 4);
+    var groups = s.blocks.filter(function(b){ return b.uids.length > 1; }).length;
+    return '<button class="set" data-act="set" data-id="' + s.id + '">'
+      + '<div class="row"><div><div class="no">' + esc(s.title) + '</div>'
+      + '<div class="cnt">' + t + ' 题 · ' + (s.topic ? s.topic : (groups ? groups + ' 段连做' : '一题一屏')) + '</div></div>'
+      + '<svg class="ring" viewBox="0 0 ' + r + ' ' + r + '"><circle class="bg" cx="' + (r/2) + '" cy="' + (r/2) + '" r="' + (r/2-4) + '"/>'
+      + '<circle class="fg" cx="' + (r/2) + '" cy="' + (r/2) + '" r="' + (r/2-4) + '" stroke-dasharray="' + c + '" stroke-dashoffset="' + (c*(1-pct/100)) + '" opacity="' + (pct?1:.25) + '"/></svg></div>'
+      + '<div class="bar"><i style="width:' + pct + '%"></i></div>'
+      + '<div class="st"><span>' + (pct >= 80 ? '已掌握' : (p.times ? '最佳 ' + pct + '%' : '未开始')) + '</span>'
+      + '<span class="mono">' + (p.times ? pct + '%' : '—') + '</span></div>'
+      + '</button>';
+  }).join('');
+
+  var rows = ['A','B','C'].map(function(cat){
+    var bs = blocksOfSection(cat);
+    var n = questionsIn(bs);
+    var p = STORE['rnd_' + cat];
+    var note = cat === 'A' ? '一题一屏 · 共 ' + n + ' 题'
+      : n + ' 题 · ' + bs.length + ' 篇 · 每篇连做';
+    if(p && p.times){ note += ' · 最佳 ' + Math.round(num(p.best)/n*100) + '%'; }
+    var sub = cat === 'A' ? '单句对话' : (cat === 'B' ? '3~4 题一屏' : '短文 3~4 题一屏');
+    return '<button class="rnd" data-act="rnd" data-cat="' + cat + '">'
+      + '<span class="ic">' + iconFor(cat) + '</span>'
+      + '<span class="tx"><b>' + SEC_SHORT[cat] + '</b><i>' + note + '</i></span>'
+      + '<span class="rt"><b class="mono">' + n + '</b><i>' + sub + '</i></span>'
+      + '<span class="arw">' + ARROW + '</span>'
+      + '</button>';
+  }).join('');
+
+  var clTotal = CLOZE_IDS.length;
+  var clRec = STORE['cloze'] || {};
+  var clBest = num(clRec.best);
+  var clozeCard = '<button class="rnd" data-act="cloze">'
+    + '<span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2C5F51" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h9M4 18h13"/><path d="M17 15l2 2 3-4"/></svg></span>'
+    + '<span class="tx"><b>' + esc(CLOZE.title) + '</b><i>' + esc(CLOZE.sub) + ' · ' + clTotal + ' 空'
+    + (clBest ? ' · 最佳 ' + clBest + '/' + clTotal : '') + '</i></span>'
+    + '<span class="rt"><b class="mono">' + clTotal + '</b><i>填空题</i></span>'
+    + '<span class="arw">' + ARROW + '</span>'
+    + '</button>';
+
+  return '<div class="wrap">'
+    + '<div class="top">'
+      + '<div class="brand"><i class="dot-logo"></i><span>Listening Drill</span></div>'
+      + '<h1>听力<em>刷题</em></h1>'
+      + '<p class="sub"><span>六级听力 + 教材听力</span>'
+      + '<span class="pill">' + BANK.length + ' 套 · ' + totalQ + ' 题</span>'
+      + '<span class="pill">已掌握 <b>' + learned + '</b></span></p>'
+    + '</div>'
+
+    + '<button class="tog' + (S.shuffle ? ' on' : '') + '" data-act="toggle-shuffle" role="switch" aria-checked="' + (S.shuffle?'true':'false') + '">'
+      + '<span class="tg-ic">' + iconShuffle + '</span>'
+      + '<span class="tg-tx"><b>选项乱序</b><i>打乱 A/B/C/D 位置，防止靠位置记答案</i></span>'
+      + '<span class="sw"><i></i></span>'
+    + '</button>'
+
+    + '<div class="sec-h"><h2>随机练习</h2>'
+      + '<button class="lnk" data-act="rnd" data-cat="all">全部混合 ' + totalQ + ' 题 →</button></div>'
+    + '<div class="rndlist">' + rows + '</div>'
+
+    + '<div class="sec-h"><h2>课文填空</h2><span>按课文填词 · 边填边判</span></div>'
+    + '<div class="rndlist">' + clozeCard + '</div>'
+
+    + '<div class="sec-h"><h2>顺序练习</h2><span>按套刷 · 篇章连做</span></div>'
+    + '<div class="grid">' + cards + '</div>'
+
+    + '<p class="foot-note">题库来自本地真题文档 · 作答记录只保存在<b>本设备</b><br>'
+    + '一题一屏 / 同篇连做 · 选项乱序 · 课文填空 · <b>连做版</b></p>'
+  + '</div>';
+}
+
+var ARROW = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
+var iconShuffle = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5F6E68" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>';
+function iconFor(cat){
+  if(cat === 'A') return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2C5F51" stroke-width="2" stroke-linecap="round"><path d="M21 11.5a8.4 8.4 0 01-9 8.4L4 21l1.2-3.8A8.4 8.4 0 1121 11.5z"/></svg>';
+  if(cat === 'B') return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2C5F51" stroke-width="2" stroke-linecap="round"><path d="M4 9v6M8 5v14M12 8v8M16 4v16M20 10v4"/></svg>';
+  return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2C5F51" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 016.5 3H19v18H6.5A2.5 2.5 0 014 18.5v-13z"/><path d="M8 7h7M8 11h5"/></svg>';
+}
+
+/* 没有译文时整段不渲染，避免出现「—」 */
+function zhSpan(o){
+  return o.zh ? '<span class="zh">' + esc(o.zh) + '</span>' : '';
+}
+
+/* =========================================================
+   练习页
+   ========================================================= */
+function viewQuiz(){
+  var b = S.blocks[S.bi];
+  if(!b) return viewHome();
+  var q0 = MAP[b.uids[0]];
+  if(!q0) return viewHome();
+
+  var isGroup = b.uids.length > 1;
+  var submitted = isGroup ? !!S.submitted[S.bi] : !!S.answers[b.uids[0]];
+  var totalQ = totalQuestions();
+  var doneQ = answeredCount();
+
+  var head = '<div class="qhead"><div class="in">'
+    + '<button class="icon-btn" data-act="home" title="返回首页" aria-label="返回首页">'
+    + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#17302B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>'
+    + '<div class="mid"><div class="l1">' + esc(S.mode === 'seq' ? q0.setTitle : S.title)
+    + (isGroup ? '<span class="badge">连做 ' + b.uids.length + ' 题</span>' : '')
+    + (S.shuffle ? '<span class="badge alt">乱序</span>' : '')
+    + '</div><div class="l2">' + qLabel(q0) + (isGroup ? ' · ' + esc(b.group) : '') + '</div></div>'
+    + '<div class="num mono" id="hnum">' + doneQ + ' / ' + totalQ + '</div>'
+    + '</div><div class="pbar"><i id="hbar" style="width:' + (totalQ ? doneQ/totalQ*100 : 0) + '%"></i></div></div>';
+
+  var body = '';
+  if(isGroup){
+    body += passageCard(b, q0);
+    if(submitted) body += gsumHTML(b);
+    b.uids.forEach(function(uid){
+      body += cardHTML(MAP[uid], submitted);
+    });
+  } else {
+    body += singleHTML(q0, submitted);
+  }
+
+  return head + '<div class="qbody">' + body + '</div>' + barHTML(b, isGroup, submitted);
+}
+
+function passageCard(b, q0){
+  var dots = '';
+  b.uids.forEach(function(uid){
+    var cls = S.answers[uid] ? 'on' : '';
+    if(S.focus === uid) cls += (cls ? ' ' : '') + 'cur';
+    dots += '<i class="' + cls + '"></i>';
+  });
+  var title = (S.mode === 'seq' ? '' : q0.setTitle + ' · ') + b.group;
+  var meta = '第 ' + b.range[0] + '–' + b.range[1] + ' 题 · 共 ' + b.uids.length + ' 题';
+  return '<div class="passage">'
+    + '<div class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2C5F51" stroke-width="2" stroke-linecap="round"><path d="M4 9v6M8 5v14M12 8v8M16 4v16M20 10v4"/></svg></div>'
+    + '<div><div class="t">' + esc(title) + '</div><div class="d">' + meta + '</div></div>'
+    + '<div class="dots" id="gdots">' + dots + '</div></div>';
+}
+
+function gsumHTML(b){
+  var right = 0, items = '';
+  b.uids.forEach(function(uid){
+    var q = MAP[uid], ok = isRight(uid);
+    if(ok) right++;
+    items += '<i class="' + (ok ? 'ok' : 'no') + '">' + q.no + '</i>';
+  });
+  return '<div class="gsum"><div class="gt"><b>本组 ' + b.uids.length + ' 题 · 答对 ' + right + '</b>'
+    + '<span>' + (right === b.uids.length ? '全部正确，继续下一组' : '逐题解析在下方') + '</span></div>'
+    + '<div class="gd">' + items + '</div></div>';
+}
+
+function cardHTML(q, graded){
+  var a = S.answers[q.uid];
+  var order = orderOf(q);
+  var opts = '';
+  for(var i = 0; i < 4; i++){
+    var key = order[i], letter = 'ABCD'[i], o = q.options[key] || {en:'', zh:''};
+    var cls = 'opt', mark = '', tick = '';
+    if(graded){
+      cls += ' locked answered';
+      if(key === q.answer){ cls += ' correct'; mark = '<div class="mark">正确答案</div>'; tick = TICK; }
+      else if(a && a.key === key){ cls += ' wrong'; }
+      else { cls += ' dim'; }
+    } else if(a && a.key === key){
+      cls += ' sel';
+    }
+    opts += '<button class="' + cls + '" data-act="pick" data-q="' + q.uid + '" data-k="' + letter + '"'
+      + (S.anim && !graded ? ' style="animation-delay:' + (i*22) + 'ms"' : '') + '>'
+      + '<span class="L">' + letter + '</span>'
+      + '<span class="body"><span class="en">' + esc(o.en) + '</span>'
+      + zhSpan(o) + mark + '</span>'
+      + tick + '</button>';
+  }
+
+  var ok = !!(a && a.key === q.answer);
+  var stCls = graded ? (ok ? 'ok' : 'no') : (a ? 'on' : '');
+  var stTxt = graded ? (ok ? '正确' : '错误') : (a ? ('已选 ' + a.letter) : '未作答');
+
+  var fb = '';
+  if(graded){
+    var zh = q.options[q.answer].zh || '';
+    var mine = a ? ('你选 ' + a.letter) : '未作答';
+    fb = '<div class="fb ' + (ok ? 'ok' : 'no') + '">'
+      + '<div class="fbh"><span class="r">' + (ok ? '✓ 回答正确' : '✗ 回答错误') + '</span>'
+      + '<span class="al">' + (ok ? ('答案 <b>' + ansLetterOf(q) + '</b>') : (mine + ' · 正确 <b>' + ansLetterOf(q) + '</b>'))
+      + (zh ? ' · ' + esc(zh) : '') + '</span></div>'
+      + '<div class="fbt"><b>串记</b>' + tipHTML(q) + '</div></div>';
+  }
+
+  return '<section class="qcard' + (graded ? ' graded' : '') + (S.focus === q.uid ? ' focus' : '') + '" data-uid="' + q.uid + '">'
+    + '<div class="qh"><span class="qt">Question ' + q.no + '</span>'
+    + '<span class="qs ' + stCls + '" data-state>' + stTxt + '</span></div>'
+    + '<div class="opts">' + opts + '</div>'
+    + fb
+    + '</section>';
+}
+
+function singleHTML(q, answered){
+  var a = S.answers[q.uid];
+  var order = orderOf(q);
+  var opts = '';
+  for(var i = 0; i < 4; i++){
+    var key = order[i], letter = 'ABCD'[i], o = q.options[key] || {en:'', zh:''};
+    var cls = 'opt', mark = '', tick = '';
+    if(answered){
+      cls += ' locked answered';
+      if(key === q.answer){ cls += ' correct'; mark = '<div class="mark">正确答案</div>'; tick = TICK; }
+      else if(a && a.key === key){ cls += ' wrong'; }
+      else { cls += ' dim'; }
+    }
+    opts += '<button class="' + cls + '" data-act="pick" data-q="' + q.uid + '" data-k="' + letter + '"'
+      + (S.anim ? ' style="animation-delay:' + (i*26) + 'ms"' : '') + '>'
+      + '<span class="L">' + letter + '</span>'
+      + '<span class="body"><span class="en">' + esc(o.en) + '</span>'
+      + zhSpan(o) + mark + '</span>'
+      + tick + '</button>';
+  }
+
+  var passage = '';
+  if(q.group){
+    var dots = '';
+    for(var d = 1; d <= q.gtotal; d++){
+      dots += '<i class="' + (d === q.gidx ? 'cur' : (d < q.gidx ? 'on' : '')) + '"></i>';
+    }
+    passage = '<div class="passage">'
+      + '<div class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2C5F51" stroke-width="2" stroke-linecap="round"><path d="M4 9v6M8 5v14M12 8v8M16 4v16M20 10v4"/></svg></div>'
+      + '<div><div class="t">' + esc(q.group) + '</div><div class="d">第 ' + q.range[0] + '–' + q.range[1] + ' 题 · 连续听力共 ' + q.gtotal + ' 题</div></div>'
+      + '<div class="dots">' + dots + '</div></div>';
+  }
+
+  var verdict = '', ansCard = '';
+  if(answered){
+    var ok = a && a.key === q.answer;
+    verdict = '<div class="verdict ' + (ok ? 'ok' : 'no') + '">'
+      + '<div class="v">'
+      + (ok
+        ? '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2F7A55" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.4l2.4 2.4 4.6-4.9"/></svg> 回答正确'
+        : '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B85445" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg> 回答错误 · 正确答案是 ' + ansLetterOf(q))
+      + '</div><div class="hint">' + (ok ? '保持这个节奏' : '看一眼解析再走') + '</div></div>';
+
+    var srcLine = '';
+    if(S.mode === 'rnd'){
+      var segs = ['<b>' + esc(q.setTitle) + '</b>'];
+      if(q.group){ segs.push(esc(q.group) + (q.range ? '（' + q.range[0] + '–' + q.range[1] + ' 题）' : '')); }
+      else { segs.push(qLabel(q)); }
+      segs.push('第 ' + q.no + ' 题');
+      srcLine = '<div class="src"><span class="si"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#93A09A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 016.5 3H19v18H6.5A2.5 2.5 0 014 18.5v-13z"/><path d="M8 7h7M8 11h5"/></svg></span>'
+        + '<span>出自 ' + segs.join(' · ') + '</span></div>';
+    }
+
+    ansCard = '<div class="ans">'
+      + '<div class="h"><span class="k">Answer</span><span class="a"><b>' + ansLetterOf(q) + '</b>'
+      + '<span>' + esc(q.options[q.answer].zh || '') + '</span></span></div>'
+      + '<div class="tip"><div class="ti"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C08B54" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 00-3.5 10.9c.6.5 1 1.3 1 2.1h5c0-.8.4-1.6 1-2.1A6 6 0 0012 3z"/></svg></div>'
+      + '<div class="c"><div class="lb">' + tipLabel(q) + '</div>' + tipHTML(q) + '</div></div>'
+      + srcLine
+      + '</div>';
+  }
+
+  return passage
+    + '<div class="qmeta"><span class="tag">' + qLabel(q) + '</span>'
+    + (answered ? '<span class="sep"></span><span class="tag">已作答</span>' : '') + '</div>'
+    + '<h2 class="qno">Question ' + q.no + '<small>' + (S.mode === 'rnd' ? esc(q.setTitle) + ' · 第 ' + q.no + ' 题' : '第 ' + q.no + ' 题') + '</small></h2>'
+    + (answered ? '' : '<p class="qask">听录音，选出最合适的答案</p>')
+    + '<div class="opts' + (S.anim ? ' anim' : '') + '">' + opts + '</div>'
+    + (answered ? '' :
+        '<div class="hintcard"><div class="hi"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#93A09A" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg></div>'
+        + '<div class="hc"><b>HOW TO</b>' + SEC_TIP[qCat(q)] + '</div></div>')
+    + verdict + ansCard;
+}
+
+function barHTML(b, isGroup, submitted){
+  var last = S.bi + 1 >= S.blocks.length;
+  var prev = '<button class="btn btn-prev" data-act="prevblock"'
+    + (S.bi === 0 ? ' disabled' : '') + '>'
+    + '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>上一题</button>';
+  var main;
+
+  if(isGroup && !submitted){
+    var done = 0;
+    b.uids.forEach(function(u){ if(S.answers[u]) done++; });
+    var all = done === b.uids.length;
+    main = '<button class="btn btn-primary" id="subbtn" data-act="submit" ' + (all ? '' : 'disabled') + '>'
+      + '提交本组 <span class="mono">' + done + '/' + b.uids.length + '</span></button>';
+  } else if(isGroup && submitted){
+    main = '<button class="btn btn-primary" data-act="nextblock">'
+      + (last ? '查看结果' : '下一组') + ARROW_SM + '</button>';
+  } else {
+    main = '<button class="btn btn-primary" data-act="next" ' + (submitted ? '' : 'disabled') + '>'
+      + (last ? '查看结果' : '下一题') + ARROW_SM + '</button>';
+  }
+  return '<div class="actions"><div class="in">' + prev + main + '</div></div>';
+}
+var ARROW_SM = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12 5l7 7-7 7"/></svg>';
+
+/* =========================================================
+   结果页
+   ========================================================= */
+function viewResult(){
+  var total = totalQuestions();
+  var right = countRight();
+  var pct = total ? Math.round(right / total * 100) : 0;
+
+  var wrong = [];
+  S.blocks.forEach(function(b){
+    b.uids.forEach(function(uid){
+      if(!isRight(uid)) wrong.push(MAP[uid]);
+    });
+  });
+
+  var rev = wrong.map(function(q){
+    var a = S.answers[q.uid];
+    return '<div class="rev">'
+      + '<div class="t"><b>' + esc(q.setTitle) + ' · 第 ' + q.no + ' 题</b>'
+      + '<span class="r no">' + (a ? '你选 ' + a.letter : '未作答') + '</span></div>'
+      + '<div class="e">' + esc(q.options[q.answer].en) + '</div>'
+      + '<div class="z">' + esc(q.options[q.answer].zh || '') + ' · 答案 ' + ansLetterOf(q) + '</div>'
+      + '</div>';
+  }).join('');
+
+  var C = 2 * Math.PI * 74;
+  var off = C * (1 - pct/100);
+  var emo = pct >= 90 ? '稳了' : (pct >= 70 ? '不错' : (pct >= 50 ? '还需再刷' : '别急，慢慢来'));
+
+  return '<div class="wrap">'
+    + '<div class="result">'
+      + '<div class="lab">Session Complete</div>'
+      + '<h2>' + esc(S.title) + ' · ' + emo + '</h2>'
+      + '<div class="score"><svg width="186" height="186" viewBox="0 0 186 186">'
+      + '<circle cx="93" cy="93" r="74" fill="none" stroke="#EAE4D7" stroke-width="12"/>'
+      + '<circle cx="93" cy="93" r="74" fill="none" stroke="' + (pct >= 70 ? '#2F7A55' : (pct >= 50 ? '#C08B54' : '#B85445')) + '" stroke-width="12" stroke-linecap="round" stroke-dasharray="' + C + '" stroke-dashoffset="' + off + '" style="transition:stroke-dashoffset 1s cubic-bezier(.3,.8,.3,1)"/>'
+      + '</svg><div class="c"><div class="big mono">' + pct + '<span>%</span></div><div class="sm">正确率</div></div></div>'
+      + '<div class="stats">'
+        + '<div class="s ok"><b class="mono">' + right + '</b><span>答对</span></div>'
+        + '<div class="s no"><b class="mono">' + (total - right) + '</b><span>答错</span></div>'
+        + '<div class="s"><b class="mono">' + total + '</b><span>总题数</span></div>'
+      + '</div>'
+    + '</div>'
+    + (wrong.length
+        ? '<div class="review"><h3>错题回顾 <span>' + wrong.length + ' 题</span></h3>' + rev + '</div>'
+        : '<div class="review"><div class="empty">全部答对，这一套可以过了。</div></div>')
+    + '<div class="result-actions">'
+      + '<div class="row">'
+        + '<button class="btn btn-primary" data-act="again">再刷一次</button>'
+        + '<button class="btn btn-soft" data-act="' + (wrong.length ? 'wrongonly' : 'home') + '">' + (wrong.length ? '只刷错题' : '回首页') + '</button>'
+      + '</div>'
+      + '<button class="btn btn-ghost" style="width:100%;height:46px" data-act="home">返回首页</button>'
+    + '</div>'
+  + '</div>';
+}
+
+/* =========================================================
+   课文填空 · 视图
+   ========================================================= */
+function rowDone(row){
+  var ok = true, n = 0;
+  (row.time + ' ' + row.event).replace(/\{\{(\w+)\}\}/g, function(_, id){
+    n++; if(cState(id) !== 'ok') ok = false; return '';
+  });
+  return n > 0 && ok;
+}
+function clozeTok(str){
+  return str.replace(/\{\{(\w+)\}\}/g, function(_, id){
+    var b = CLOZE.blanks[id];
+    if(!b) return '';
+    var st = cState(id), val = S.clozeVal[id] || '';
+    var w = Math.max(4, Math.min(20, b.a[0].length));
+    /* 答案提示放在 field 内部，保证「空 + 答案」不被拆到两行 */
+    var ghost = (S.clozeShown && st !== 'ok')
+      ? '<span class="ghost">' + esc(b.a[0]) + '</span>' : '';
+    return '<span class="field' + (st ? ' ' + st : '') + '">'
+      + '<input class="blank' + (st ? ' ' + st : '') + '" type="text" data-id="' + id + '"'
+      + ' value="' + esc(val) + '" style="width:calc(' + w + 'ch + 15px)"'
+      + ' title="' + esc(b.h || '') + '" placeholder="?"'
+      + ' autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">'
+      + '<i class="mk">' + (st === 'ok' ? '✓' : (st === 'bad' ? '✗' : '')) + '</i>'
+      + ghost
+      + '</span>';
+  });
+}
+function viewCloze(){
+  var total = CLOZE_IDS.length, right = clozeRight();
+  var all = right === total;
+
+  var head = '<div class="qhead"><div class="in">'
+    + '<button class="icon-btn" data-act="home" title="返回首页" aria-label="返回首页">'
+    + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#17302B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>'
+    + '<div class="mid"><div class="l1">课文填空<span class="badge">' + total + ' 空</span>'
+    + (S.clozeShown ? '<span class="badge alt">答案已显</span>' : '') + '</div>'
+    + '<div class="l2">' + esc(CLOZE.title) + ' · ' + esc(CLOZE.sub) + '</div></div>'
+    + '<div class="num mono" id="clnum">' + right + ' / ' + total + '</div>'
+    + '</div><div class="pbar"><i id="clbar" style="width:' + (total ? right / total * 100 : 0) + '%"></i></div></div>';
+
+  var rows = CLOZE.rows.map(function(row){
+    return '<section class="clrow' + (rowDone(row) ? ' done' : '') + '">'
+      + '<div class="ct">' + clozeTok(row.time) + '</div>'
+      + '<div class="ce">' + clozeTok(row.event) + '</div>'
+      + '</section>';
+  }).join('');
+
+  var fin = '<div class="clfin' + (all ? ' show' : '') + '" id="clfin">'
+    + '<div class="tk">✓</div><div><b>全部填对，' + total + ' 个空一个不差</b>'
+    + '<span>点下面「重做」可以再来一遍。</span></div></div>';
+
+  /* 完成横幅放在最后一行下面，做完最后一空时正好在眼前 */
+  var body = '<div class="cl-intro">按课文填入所缺的词，边填边判：<b>对的变绿打 ✓</b>，<b>错的变红打 ✗</b>，改对会自动转绿。</div>'
+    + rows + fin
+    + '<p class="cl-foot"><b>提示：</b>鼠标悬停空格可看中文提示，<kbd>Enter</kbd> 跳到下一个空；'
+    + '单复数、大小写和标点不计较。<br><b>出处：</b>Reading · Fill in the Blanks</p>';
+
+  var bar = '<div class="actions"><div class="in">'
+    + '<button class="btn btn-prev" data-act="cl-reset" style="width:92px">重做</button>'
+    + '<button class="btn btn-primary" data-act="cl-reveal">'
+    + (S.clozeShown ? '隐藏答案' : '显示答案') + '</button>'
+    + '</div></div>';
+
+  return head + '<div class="qbody">' + body + '</div>' + bar;
+}
+function clozeHUD(){
+  var total = CLOZE_IDS.length, right = clozeRight(), all = right === total;
+  var n = document.getElementById('clnum'); if(n) n.textContent = right + ' / ' + total;
+  var b = document.getElementById('clbar'); if(b) b.style.width = (total ? right / total * 100 : 0) + '%';
+  var f = document.getElementById('clfin'); if(f) f.classList.toggle('show', all);
+  if(all && !S.clozeDone){
+    S.clozeDone = true;
+    var old = STORE['cloze'] || {};
+    STORE['cloze'] = {best: Math.max(num(old.best), total), times: num(old.times) + 1, total: total, ts: Date.now()};
+    saveProg(STORE);
+  }
+}
+/* 就地改一个空，不重绘整页（保住光标与滚动位置） */
+function repaintCloze(el){
+  var id = el.getAttribute('data-id'), st = cState(id), field = el.parentNode;
+  el.classList.remove('ok', 'bad'); field.classList.remove('ok', 'bad');
+  if(st){ el.classList.add(st); field.classList.add(st); }
+  var mk = field.querySelector('.mk');
+  if(mk) mk.textContent = st === 'ok' ? '✓' : (st === 'bad' ? '✗' : '');
+  var g = field.querySelector('.ghost');
+  if(g) g.style.display = (st === 'ok' ? 'none' : '');
+  var row = el.closest ? el.closest('.clrow') : null;
+  if(row){
+    var els = row.querySelectorAll('.blank'), done = els.length > 0;
+    for(var i = 0; i < els.length; i++){ if(!els[i].classList.contains('ok')) done = false; }
+    row.classList.toggle('done', done);
+  }
+  clozeHUD();
+}
+
+/* =========================================================
+   渲染
+   ========================================================= */
+var app = document.getElementById('app');
+function render(keep){
+  var html;
+  if(S.view === 'quiz') html = viewQuiz();
+  else if(S.view === 'result') html = viewResult();
+  else if(S.view === 'cloze') html = viewCloze();
+  else html = viewHome();
+  app.innerHTML = html;
+  if(!keep) window.scrollTo(0, 0);
+  if(S.view === 'result') animateRing();
+}
+/* 只重绘当前页并保持滚动位置（判分时不跳回顶部） */
+function renderKeep(){
+  var y = window.pageYOffset;
+  app.innerHTML = viewQuiz();
+  window.scrollTo(0, y);
+}
+function animateRing(){
+  var el = app.querySelector('.score svg circle:last-of-type');
+  if(!el) return;
+  var target = el.getAttribute('stroke-dashoffset');
+  el.style.strokeDashoffset = el.getAttribute('stroke-dasharray');
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){ el.style.strokeDashoffset = target; });
+  });
+}
+
+/* =========================================================
+   局部更新（连做单元内选答不整页重绘）
+   ========================================================= */
+function paintCard(uid){
+  var card = app.querySelector('.qcard[data-uid="' + uid + '"]');
+  if(!card) return;
+  var q = MAP[uid], a = S.answers[uid], order = orderOf(q);
+  var btns = card.querySelectorAll('.opt');
+  for(var i = 0; i < btns.length; i++){
+    var on = !!(a && a.key === order[i]);
+    if(on) btns[i].classList.add('sel'); else btns[i].classList.remove('sel');
+  }
+  var st = card.querySelector('[data-state]');
+  if(st){
+    st.textContent = a ? ('已选 ' + a.letter) : '未作答';
+    st.className = 'qs' + (a ? ' on' : '');
+  }
+}
+function paintFocus(){
+  var cards = app.querySelectorAll('.qcard');
+  for(var i = 0; i < cards.length; i++){
+    var uid = cards[i].getAttribute('data-uid');
+    if(uid === S.focus) cards[i].classList.add('focus'); else cards[i].classList.remove('focus');
+  }
+}
+function updateHUD(){
+  var b = S.blocks[S.bi];
+  if(!b) return;
+  var total = totalQuestions(), done = answeredCount();
+  var hn = document.getElementById('hnum');
+  if(hn) hn.textContent = done + ' / ' + total;
+  var hb = document.getElementById('hbar');
+  if(hb) hb.style.width = (total ? done / total * 100 : 0) + '%';
+
+  var d = 0;
+  b.uids.forEach(function(u){ if(S.answers[u]) d++; });
+  var sub = document.getElementById('subbtn');
+  if(sub){
+    var all = d === b.uids.length;
+    sub.disabled = !all;
+    var s = sub.querySelector('.mono');
+    if(s) s.textContent = d + '/' + b.uids.length;
+  }
+  var dots = document.getElementById('gdots');
+  if(dots){
+    var html = '';
+    b.uids.forEach(function(u){
+      var cls = S.answers[u] ? 'on' : '';
+      if(S.focus === u) cls += (cls ? ' ' : '') + 'cur';
+      html += '<i class="' + cls + '"></i>';
+    });
+    dots.innerHTML = html;
+  }
+}
+
+/* =========================================================
+   交互
+   ========================================================= */
+function pick(uid, letter){
+  var b = S.blocks[S.bi];
+  if(!b) return;
+  var isGroup = b.uids.length > 1;
+  if(isGroup && S.submitted[S.bi]) return;          // 已提交，锁定
+  if(!isGroup && S.answers[uid]) return;            // 单题模式，一选定音
+
+  var q = MAP[uid];
+  if(!q) return;
+  S.answers[uid] = {key: keyOfLetter(q, letter), letter: letter};
+
+  if(isGroup){
+    S.focus = nextUnansweredAfter(b, uid);
+    paintCard(uid);
+    paintFocus();
+    updateHUD();
+  } else {
+    S.anim = false;
+    renderKeep();
+  }
+}
+function nextUnansweredAfter(b, uid){
+  var idx = b.uids.indexOf(uid), n = b.uids.length;
+  for(var i = 1; i <= n; i++){
+    var u = b.uids[(idx + i) % n];
+    if(!S.answers[u]) return u;
+  }
+  return uid;
+}
+
+document.addEventListener('click', function(e){
+  var t = e.target.closest ? e.target.closest('[data-act]') : null;
+  if(!t) return;
+  var act = t.getAttribute('data-act');
+
+  if(act === 'set'){
+    startSet(parseInt(t.getAttribute('data-id'), 10));
+  } else if(act === 'cloze'){
+    S.view = 'cloze';
+    S.clozeShown = false;
+    render();
+  } else if(act === 'cl-reveal'){
+    S.clozeShown = !S.clozeShown;
+    render(true);
+  } else if(act === 'cl-reset'){
+    S.clozeVal = {};
+    S.clozeShown = false;
+    S.clozeDone = false;
+    render(true);
+  } else if(act === 'rnd'){
+    startRandom(t.getAttribute('data-cat'));
+  } else if(act === 'toggle-shuffle'){
+    PREF.shuffle = !PREF.shuffle;
+    savePref(PREF);
+    S.shuffle = PREF.shuffle;
+    S.orders = {};
+    render();
+  } else if(act === 'home'){
+    S.view = 'home';
+    render();
+  } else if(act === 'pick'){
+    pick(t.getAttribute('data-q'), t.getAttribute('data-k'));
+  } else if(act === 'submit'){
+    submitBlock();
+  } else if(act === 'prevblock'){
+    prevBlock();
+  } else if(act === 'nextblock'){
+    advance();
+  } else if(act === 'next'){
+    var b = S.blocks[S.bi];
+    if(!b || !S.answers[b.uids[0]]) return;
+    advance();
+  } else if(act === 'again'){
+    if(S.mode === 'seq') startSet(S.setId); else startRandom(S.cat === 'wrong' ? 'all' : S.cat);
+  } else if(act === 'wrongonly'){
+    var uids = [];
+    S.blocks.forEach(function(bk){
+      bk.uids.forEach(function(u){ if(!isRight(u)) uids.push(u); });
+    });
+    if(!uids.length) return;
+    begin(buildBlocks(uids), {mode:'rnd', cat:'wrong', title:'错题重练'});
+  }
+});
+
+/* 课文填空：边填边判，就地改色 */
+document.addEventListener('input', function(e){
+  var el = e.target;
+  if(!el || !el.classList || !el.classList.contains('blank')) return;
+  S.clozeVal[el.getAttribute('data-id')] = el.value;
+  repaintCloze(el);
+});
+document.addEventListener('keydown', function(e){
+  if(S.view !== 'cloze' || e.key !== 'Enter') return;
+  var el = e.target;
+  if(!el || !el.classList || !el.classList.contains('blank')) return;
+  e.preventDefault();
+  var list = app.querySelectorAll('.blank');
+  for(var i = 0; i < list.length; i++){
+    if(list[i] === el){ if(list[i + 1]) list[i + 1].focus(); else el.blur(); break; }
+  }
+});
+
+document.addEventListener('keydown', function(e){
+  if(S.view !== 'quiz') return;
+  var b = S.blocks[S.bi];
+  if(!b) return;
+  if(e.key === 'ArrowLeft'){ prevBlock(); e.preventDefault(); return; }
+  var isGroup = b.uids.length > 1;
+  var submitted = isGroup ? !!S.submitted[S.bi] : !!S.answers[b.uids[0]];
+
+  if(submitted){
+    if(e.key === 'Enter' || e.key === ' '){ advance(); e.preventDefault(); }
+    return;
+  }
+  var map = {a:0, b:1, c:2, d:3, '1':0, '2':1, '3':2, '4':3};
+  var k = e.key.length === 1 ? map[e.key.toLowerCase()] : undefined;
+
+  if(k !== undefined){
+    var uid = isGroup ? (S.focus || b.uids[0]) : b.uids[0];
+    if(!isGroup && S.answers[uid]) return;
+    pick(uid, 'ABCD'[k]);
+    e.preventDefault();
+  } else if(e.key === 'Enter'){
+    if(isGroup && allAnswered(b)){ submitBlock(); e.preventDefault(); }
+    else if(!isGroup && S.answers[b.uids[0]]){ advance(); e.preventDefault(); }
+  }
+});
+
+/* Android 返回键桥接 */
+window.__onBack = function(){
+  if(S.view !== 'home'){ S.view = 'home'; render(); return true; }
+  return false;
+};
+
+/* =========================================================
+   启动
+   ========================================================= */
+S.shuffle = !!PREF.shuffle;
+render();
+})();
+</script>
+</body>
+</html>
