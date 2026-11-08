@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """第 11 套 · 城市（Cities Unit 5），Section A 长对话 4 题 + Section B 短文 3 题。"""
-import json, re
+import json, os, re
 
 def Q(no, ans, opts):
     return {"no": no, "answer": ans,
@@ -89,7 +89,7 @@ def build(spec):
 
 
 def main():
-    path = "C:/tmp/qbank/bank.json"
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bank.json')
     bank = json.load(open(path, encoding="utf-8"))
     bank = [s for s in bank if s["id"] != 11]
     st = build(SET)

@@ -6,7 +6,7 @@
 - Section A：单题给一个短钩子，靠画面 / 谐音钉住那一个答案
 - 句子里不出现选项字母，所以选项乱序时永远指不错
 """
-import json, re
+import json, os, re
 
 # 单题钩子：setId-no
 SINGLE = {
@@ -104,7 +104,7 @@ def lcs(a, b):
 
 
 def main():
-    path = 'C:/tmp/qbank/bank.json'
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bank.json')
     bank = json.load(open(path, encoding='utf-8'))
     used_single, used_group = set(), set()
     warn = []

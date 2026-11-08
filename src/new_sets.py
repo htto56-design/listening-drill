@@ -4,7 +4,7 @@
 每套结构：Section A 长对话 4 题（同屏连做）+ Section B 短文 3~4 题（同屏连做）
 答案取自卷面上的手写标记。
 """
-import json, re
+import json, os, re
 
 def Q(no, ans, opts, tip=None):
     return {"no": no, "answer": ans,
@@ -274,7 +274,7 @@ def build(spec):
 
 
 def main():
-    path = "C:/tmp/qbank/bank.json"
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bank.json')
     bank = json.load(open(path, encoding="utf-8"))
     bank = [s for s in bank if s["id"] not in (7, 8, 9, 10)]
 

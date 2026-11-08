@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-import json, re
+import json, os, re
 
-bank = json.load(open('C:/tmp/qbank/bank_raw.json', encoding='utf-8'))
+HERE = os.path.dirname(os.path.abspath(__file__))
+bank = json.load(open(os.path.join(HERE, 'bank_raw.json'), encoding='utf-8'))
 
 def has_digit_start(s):
     return bool(re.match(r'^\s*[\$€£]?\d', s))
@@ -116,7 +117,7 @@ for s in bank:
         # 中文关键词（用于答案卡高亮）
         q['key'] = short_zh(zh)
 
-json.dump(bank, open('C:/tmp/qbank/bank.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+json.dump(bank, open(os.path.join(HERE, 'bank.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 print(cnt)
 print(sum(len(s['questions']) for s in bank), '题')
 for q in bank[0]['questions'][:3]:
