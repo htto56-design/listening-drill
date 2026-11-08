@@ -1,5 +1,10 @@
 # 听力刷题 · 连做版
 
+[![stars](https://img.shields.io/github/stars/htto56-design/listening-drill?style=flat-square&color=2C5F51)](https://github.com/htto56-design/listening-drill/stargazers)
+[![forks](https://img.shields.io/github/forks/htto56-design/listening-drill?style=flat-square&color=2C5F51)](https://github.com/htto56-design/listening-drill/forks)
+[![last commit](https://img.shields.io/github/last-commit/htto56-design/listening-drill?style=flat-square)](https://github.com/htto56-design/listening-drill/commits/main)
+[![visitors](https://hits.sh/github.com/htto56-design/listening-drill.svg?style=flat-square&label=visitors&color=2C5F51)](https://hits.sh/github.com/htto56-design/listening-drill/)
+
 一个**完全离线**的英语听力刷题工具，单文件 HTML，双击就能用。另附 Windows 桌面版与安卓版，三端跑的是**同一份 HTML**（apk 内嵌资源与 html 的 MD5 一致）。
 
 - 11 套卷 · 179 题（六级听力真题 6 套 + 教材听力 5 套）
@@ -135,6 +140,24 @@ pyinstaller --onefile --windowed --name "听力刷题-连做版" \
 - **apk 未真机验证**：本机没有安卓设备，只做了静态校验（签名、清单、内嵌资源 MD5）。
 - **第 8 套缺第 8 题**：原卷照片只拍到第 7 题。
 
+## 访问统计
+
+- 顶部 `visitors` 徽章是第三方计数（hits.sh），**只累加次数，不记录任何个人信息**。GitHub 会缓存徽章图片，数字可能滞后于真实访问。
+- 更准确的数据在仓库自己的 **Insights → Traffic**：近 14 天的浏览数、克隆数、来源站点，只有仓库所有者登录后可见。
+- **看不到「谁」**：GitHub 不向仓库所有者提供访问者的账号、IP 或逐条时间明细，本仓库也没有接入任何埋点或指纹识别。想让访客留名，只能开 Discussions 让人自愿留言。
+- 应用本身（html / exe / apk）**不联网、不上报**，答题记录只写本机 `localStorage`。
+
+## 免责声明
+
+1. **用途**：本项目仅供个人学习与自测使用，不得用于商业用途、培训收费或任何形式的售卖。
+2. **版权**：题库中的听力原文、选项与译文版权归原出版方（六级真题出版机构及教材出版社）所有，本项目仅作个人练习整理，未获授权。若权利人提出异议，会立即下架相关内容。
+3. **答案准确性**：除第 1~6 套为历年真题外，第 7~11 套的答案取自纸质卷面上的手写标记，**不是官方答案**；第 11 套笔迹较淡，存在识别误差。请以官方答案为准，因答案错误造成的任何后果作者不承担责任。
+4. **无音频**：仓库不包含任何音频文件，需自备原卷音源。
+5. **无关联**：本项目与任何考试机构、出版社、教育平台均无关联，未获其授权或背书。
+6. **按现状提供**：代码与产物按「AS IS」提供，不保证无缺陷或不中断维护；使用本工具产生的任何直接或间接损失由使用者自行承担。
+7. **分发提示**：`exe` 未做代码签名、`apk` 使用 Android 调试证书签名，他人可重新打包同名程序。请只从本仓库下载；从第三方渠道获取的安装包请自行核验。
+
 ## License
 
-仅用于个人学习。题目文字版权归原出版方所有。
+代码部分 MIT。题库文字版权归原出版方，不在 MIT 授权范围内。
+
