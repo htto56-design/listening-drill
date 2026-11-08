@@ -1,9 +1,20 @@
 # 听力刷题 · 连做版
 
+[![下载最新版](https://img.shields.io/badge/%E4%B8%8B%E8%BD%BD%E6%9C%80%E6%96%B0%E7%89%88-v1.0-2C5F51?style=for-the-badge)](https://github.com/htto56-design/listening-drill/releases/latest)
 [![stars](https://img.shields.io/github/stars/htto56-design/listening-drill?style=flat-square&color=2C5F51)](https://github.com/htto56-design/listening-drill/stargazers)
 [![forks](https://img.shields.io/github/forks/htto56-design/listening-drill?style=flat-square&color=2C5F51)](https://github.com/htto56-design/listening-drill/forks)
 [![last commit](https://img.shields.io/github/last-commit/htto56-design/listening-drill?style=flat-square)](https://github.com/htto56-design/listening-drill/commits/main)
 [![visitors](https://hits.sh/github.com/htto56-design/listening-drill.svg?style=flat-square&label=visitors&color=2C5F51)](https://hits.sh/github.com/htto56-design/listening-drill/)
+
+## 下载
+
+| 平台 | 文件 | 大小 | 说明 |
+|---|---|---|---|
+| Windows | **[listening-drill.exe](https://github.com/htto56-design/listening-drill/releases/download/v1.0/listening-drill.exe)** | 15.9 MB | 免安装，需系统 WebView2 |
+| Android 5.0+ | **[listening-drill.apk](https://github.com/htto56-design/listening-drill/releases/download/v1.0/listening-drill.apk)** | 76.9 KB | 包名 `com.listen.drill.v3` |
+| 全平台 | **[listening-drill.html](https://github.com/htto56-design/listening-drill/releases/download/v1.0/listening-drill.html)** | 163 KB | 浏览器双击打开，Chrome / Edge / Safari |
+
+历史版本见 **[Releases](https://github.com/htto56-design/listening-drill/releases)**。
 
 一个**完全离线**的英语听力刷题工具，单文件 HTML，双击就能用。另附 Windows 桌面版与安卓版，三端跑的是**同一份 HTML**（apk 内嵌资源与 html 的 MD5 一致）。
 
@@ -11,13 +22,14 @@
 - 1 块课文填空（*Happy Birthday to You* 版权案，20 空）
 - 不联网、不登录、无广告，答题记录只存在本机 `localStorage`
 
-## 直接使用
+## 仓库里有什么
 
-| 文件 | 适用 | 说明 |
-|---|---|---|
-| `听力刷题-连做版.html` | 全平台 | 浏览器双击打开，Chrome / Edge / Safari 均可 |
-| `听力刷题-连做版.exe` | Windows | 独立窗口，免安装；需要系统自带 WebView2（Win10/11 默认有） |
-| `听力刷题-连做版.apk` | Android 5.0+ | 包名 `com.listen.drill.v3`，可与旧版共存 |
+```
+听力刷题-连做版.html / .exe / .apk   即上面的三个产物（与 Release 附件同一份）
+src/                                题库、模板、构建脚本
+desktop/  android/                  exe / apk 的打包工程
+docs/                               使用说明、代码审查报告
+```
 
 ## 功能
 
